@@ -6,17 +6,17 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "zbot"
-description = "python3 irc bot"
-version = "102"
+name = "objd"
+description = "objects daemon"
+version = "1"
 authors = [
-    {name = "Bart Thate",email = "objx@proton.me"},
+    {name = "xobjects",email = "objx@proton.me"},
 ]
 readme = "README.rst"
 license = {text="Public Domain"}
 dependencies = [
     'objx',
-    'botl'
+    'objr'
 ]
 classifiers = [ 
     'Development Status :: 3 - Alpha',
@@ -27,15 +27,17 @@ classifiers = [
 ]
 
 [project.urls]
-"home" = "https://pypi.org/project/zbot"
-"bugs" = "https://github.com/xobjectz/zbot/issues"
-"source" = "https://github.com/xobjectz/zbot"
+"home" = "https://pypi.org/project/objd"
+"bugs" = "https://github.com/xobjectz/objd/issues"
+"source" = "https://github.com/xobjectz/objd"
 
 [tool.setuptools]
 script-files = [
-    'bin/zbot',
+    'bin/objd',
+    'bin/objz'
 ]
 packages = [
-    "zbot",
+    "objd",
+    "objd.modules"
 ]
 zip-safe=true
