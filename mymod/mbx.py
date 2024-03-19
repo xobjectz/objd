@@ -11,7 +11,7 @@ import os
 import time
 
 
-from objx import Object, fmt, update
+from objr import Object, fmt, update
 from objr import Client, Persist, find, fntime, laps, sync
 
 

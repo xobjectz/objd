@@ -9,8 +9,7 @@
 import time
 
 
-from objx import Object
-from objr import Client, Persist, find, fntime, laps, sync
+from objr import Client, Object, Persist, find, fntime, laps, sync
 
 
 class Log(Object):

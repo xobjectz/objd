@@ -11,9 +11,8 @@ import re
 import time as ttime
 
 
-from objx import update
 from objr import Broker, Client, Event, Persist, Timer
-from objr import find, laps, launch, sync
+from objr import find, laps, launch, sync, update
 
 
 def init():

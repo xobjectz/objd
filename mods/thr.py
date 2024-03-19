@@ -10,17 +10,10 @@ import threading
 import time
 
 
-from objx import Object, update
-from objr import Client, laps
-
-
-"defines"
+from objr import Client, Object, laps, update
 
 
 STARTTIME = time.time()
-
-
-"commands"
 
 
 def thr(event):

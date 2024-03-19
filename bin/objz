@@ -19,11 +19,8 @@ import time
 sys.path.insert(0, os.getcwd())
 
 
-from objx import Default
-from objr import Client, Errors, Event, Workdir
+from objr import Client, Default, Errors, Event, Workdir
 from objr import cmnd, debug, forever, init, parse_cmd
-
-
 from objd import modules
 
 

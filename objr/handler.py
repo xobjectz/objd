@@ -17,9 +17,6 @@ from .runtime import Broker, Errors, parse_cmd
 from .threads import launch
 
 
-"classes"
-
-
 class Event(Default):
 
     def __init__(self):
@@ -120,9 +117,6 @@ class Client(Handler):
     def show(self, evt):
         for txt in evt.result:
             self.say(evt.channel, txt)
-
-
-"utilities"
 
 
 def cmnd(txt, out):

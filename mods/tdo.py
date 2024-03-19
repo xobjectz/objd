@@ -9,8 +9,7 @@
 import time
 
 
-from objx import Object
-from objr import Client, Persist, fntime, find, laps, sync
+from objr import Client, Object, Persist, fntime, find, laps, sync
 
 
 class NoDate(Exception):

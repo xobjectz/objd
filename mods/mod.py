@@ -9,13 +9,10 @@
 import os
 
 
-from objr.handler import Client
+from objr import Client
 
 
 from . import __dir__
-
-
-"commands"
 
 
 def mod(event):

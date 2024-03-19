@@ -14,7 +14,7 @@ import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 
-from objx import Default, Object
+from objr import Default, Object
 from objr import Errors, Persist, Workdir, debug, launch
 
 

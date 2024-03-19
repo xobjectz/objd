@@ -13,9 +13,6 @@ import threading
 from .threads import launch
 
 
-"classes"
-
-
 class Timer:
 
     def __init__(self, sleep, func, *args, thrname=None):

@@ -9,9 +9,6 @@
 from .objects import Object
 
 
-"classes"
-
-
 class Default(Object):
 
     __slots__ = ("__default__",)

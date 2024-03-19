@@ -79,7 +79,7 @@ p.s.
 """
 
 
-from objr.handler import Client
+from objr import Client
 
 
 def req(event):

@@ -15,12 +15,8 @@ import sys
 import time
 
 
-from objx import Default
-from objr import Workdir, forever, init
+from objr import Default, Workdir, forever, init
 from objd import modules
-
-
-"defines"
 
 
 Cfg         = Default()
@@ -33,9 +29,6 @@ Workdir.wd = Cfg.wd
 
 
 dte = time.ctime(time.time()).replace("  ", " ")
-
-
-"utilities"
 
 
 def daemon(pidfile, verbose=False):
