@@ -11,11 +11,8 @@ import os
 import pathlib
 import time
 
-from objx import Default, Object
-from objx import dump, load, fqn, search, update
 
-
-from objx.locking import disklock
+from objr import Default, Object, fqn, read, search, update, write
 
 
 "classes"
@@ -115,25 +112,12 @@ def last(obj, selector=None):
         return inp[0]
 
 
-def read(obj, pth):
-    with disklock:
-        with open(pth, 'r', encoding='utf-8') as ofile:
-            update(obj, load(ofile))
-
-
 def sync(obj, pth=None):
     if pth is None:
         pth = ident(obj)
     pth2 = Workdir.store(pth)
     write(obj, pth2)
     return pth
-
-
-def write(obj, pth):
-    with disklock:
-        Workdir.cdir(os.path.dirname(pth))
-        with open(pth, 'w', encoding='utf-8') as ofile:
-            dump(obj, ofile, indent=4)
 
 
 "utilitites"

@@ -6,7 +6,9 @@
 "runtime"
 
 
+from .default import *
 from .handler import *
+from .objects import *
 from .persist import *
 from .repeats import *
 from .runtime import *
@@ -17,6 +19,7 @@ def __dir__():
     return (
         'Broker',
         'Client',
+        'Default',
         'Errors',
         'Event',
         'Handler',
@@ -41,7 +44,28 @@ def __dir__():
         'spl',
         'sync',
         'write'
+    ) + __dir2__()
+
+
+def __dir2__():
+    return (
+        'Object',
+        'construct',
+        'dump',
+        'dumps',
+        'edit',
+        'fmt',
+        'fqn',
+        'hook',
+        'items',
+        'keys',
+        'load',
+        'loads',
+        'search',
+        'update',
+        'values'
     )
+
 
 
 __all__ = __dir__()

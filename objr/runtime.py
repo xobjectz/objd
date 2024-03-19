@@ -12,16 +12,11 @@ import traceback
 import _thread
 
 
-from objx import Default, Object, keys, values
-
-
-"defines"
+from .default import Default
+from .objects import Object, keys, values
 
 
 rpr = object.__repr__
-
-
-"classes"
 
 
 class Broker:
@@ -97,9 +92,6 @@ class Errors:
             if skp in str(txt):
                 return True
         return False
-
-
-"utilitites"
 
 
 def debug(txt):
