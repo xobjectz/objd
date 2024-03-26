@@ -21,7 +21,7 @@ import _thread
 sys.path.insert(0, os.getcwd())
 
 
-from objx import Default, Object, edit, fmt, keys, update
+from objr import Default, Object, edit, fmt, keys, update
 from objr import Broker, Client, Errors, Event, Workdir
 from objr import debug, laps, last, launch, parse_cmd, spl
 

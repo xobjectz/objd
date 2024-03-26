@@ -157,7 +157,10 @@ class ObjectDecoder(json.JSONDecoder):
         return json.JSONDecoder.__init__(self, *args)
 
     def decode(self, s, _w=None):
-        val = json.JSONDecoder.decode(self, s)
+        try:
+            val = json.JSONDecoder.decode(self, s)
+        except json.decoder.JSONDecodeError:
+            val = {}
         if not val:
             val = {}
         return hook(val)
