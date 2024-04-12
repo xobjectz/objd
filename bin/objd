@@ -153,6 +153,8 @@ def wrap(func):
 def main():
     skel()
     parse_cmd(Cfg, " ".join(sys.argv[1:]))
+    if Cfg.txt:
+        return cmnd(Cfg.otxt, print)
     if 'a' in Cfg.opts:
         Cfg.mod = ",".join(objd.__dir__())
     if "v" in Cfg.opts:
@@ -167,8 +169,6 @@ def main():
         while 1:
             time.sleep(1.0)
         return
-    if 'x' in Cfg.opts:
-        return cmnd(Cfg.otxt, print)
     Cfg.mod = ",".join(objd.__dir__())
     Cfg.user = getpass.getuser()
     daemon(Cfg.pidfile, "v" in Cfg.opts)

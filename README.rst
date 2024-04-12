@@ -51,12 +51,13 @@ USAGE
 
 ::
 
-    without any argument the program does nothing
+    without any argument the program starts a daemon
 
     $ objd
     $
 
-    see list of commands
+    with arguments the bot will run it as a command, use `cmd` to see list
+    of commands
 
     $ objd cmd
     cmd,err,mod,req,thr,ver
@@ -141,7 +142,7 @@ SYSTEMD
     User=<user>
     Group=<user>
     WorkingDirectory=/home/<user>/.objd
-    ExecStart=/home/<user>/.local/pipx/venvs/zbot/bin/objd
+    ExecStart=/home/<user>/.local/pipx/venvs/objd/bin/objd
     RemainAfterExit=yes
 
     [Install]
@@ -149,6 +150,7 @@ SYSTEMD
 
     then run this
 
+    $ pipx ensurepath
     $ mkdir ~/.objd
     $ sudo systemctl enable objd --now
 

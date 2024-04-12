@@ -8,9 +8,9 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "objd"
 description = "object daemon"
-version = "2"
+version = "3"
 authors = [
-    {name = "xobjects",email = "objx@proton.me"},
+    {name = "Bart Thate",email = "bthate@dds.nl"},
 ]
 readme = "README.rst"
 license = {text="Public Domain"}
@@ -37,6 +37,7 @@ script-files = [
 ]
 packages = [
     "objd",
+]
 
 
 zip-safe=true
