@@ -34,10 +34,8 @@ classifiers = [
 [tool.setuptools]
 script-files = [
     'bin/objd',
-    'bin/objz'
 ]
 packages = [
     "objd",
-    "objd.modules"
 ]
 zip-safe=true

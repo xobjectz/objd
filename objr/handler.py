@@ -1,9 +1,9 @@
 # This file is placed in the Public Domain.
 #
-# pylint: disable=C,R,W0105,W0212,W0613,W0718,E0402,E1102
+# pylint: disable=C,R,W0105,W0212
 
 
-"hander"
+"handler"
 
 
 import queue
@@ -11,53 +11,32 @@ import threading
 import _thread
 
 
-from .default import Default
-from .objects import Object
-from .runtime import Broker, Errors, parse_cmd
-from .threads import launch
+from objx import Object
 
 
-class Event(Default):
-
-    def __init__(self):
-        Default.__init__(self)
-        self._thr    = None
-        self._ready  = threading.Event()
-        self.done    = False
-        self.orig    = None
-        self.result  = []
-        self.txt     = ""
-        self.type    = "event"
-
-    def ready(self):
-        self._ready.set()
-
-    def reply(self, txt):
-        self.result.append(txt)
-
-    def wait(self):
-        if self._thr:
-            self._thr.join()
-        self._ready.wait()
-        return self.result
+from .thread import launch
 
 
 class Handler:
 
+    "Handler"
+
     def __init__(self):
-        self.cbs = Object()
+        self.cbs      = Object()
         self.queue    = queue.Queue()
         self.stopped  = threading.Event()
         self.threaded = True
 
     def callback(self, evt):
+        "call callback based on event type."
         func = getattr(self.cbs, evt.type, None)
         if not func:
             evt.ready()
             return
-        evt._thr = launch(func, evt)
+        evt._thr = launch(func, self, evt)
 
     def loop(self):
+        "proces events until interrupted."
         while not self.stopped.is_set():
             try:
                 evt = self.poll()
@@ -66,80 +45,21 @@ class Handler:
                 _thread.interrupt_main()
 
     def poll(self):
+        "function to return event."
         return self.queue.get()
 
     def put(self, evt):
+        "put event into the queue."
         self.queue.put_nowait(evt)
 
     def register(self, typ, cbs):
+        "register callback for a type."
         setattr(self.cbs, typ, cbs)
 
     def start(self):
+        "start the event loop."
         launch(self.loop)
 
     def stop(self):
+        "stop the event loop."
         self.stopped.set()
-
-
-class Client(Handler):
-
-    cmds = Object()
-
-    def __init__(self):
-        Handler.__init__(self)
-        self.register("command", self.command)
-        Broker.add(self)
-
-    @staticmethod
-    def add(func):
-        setattr(Client.cmds, func.__name__, func)
-
-    def announce(self, txt):
-        self.raw(txt)
-
-    def command(self, evt):
-        parse_cmd(evt)
-        func = getattr(Client.cmds, evt.cmd, None)
-        if func:
-            try:
-                func(evt)
-            except Exception as exc:
-                Errors.add(exc)
-        self.show(evt)
-        evt.ready()
-
-    def raw(self, txt):
-        pass
-
-    def say(self, channel, txt):
-        self.raw(txt)
-
-    def show(self, evt):
-        for txt in evt.result:
-            self.say(evt.channel, txt)
-
-
-def cmnd(txt, out):
-    clt = Client()
-    clt.raw = out
-    evn = Event()
-    evn.orig = object.__repr__(clt)
-    evn.txt = txt
-    clt.command(evn)
-    evn.wait()
-    return evn
-
-
-"interface"
-
-
-def __dir__():
-    return (
-        'Event',
-        'Handler',
-        'Client',
-        'cmnd'
-    )
-
-
-__all__ = __dir__()

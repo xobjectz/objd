@@ -5,30 +5,92 @@
 # ruff: noqa: E402
 
 
-"24/7 feed fetcher"
+"""OBJR - objects runtime
+
+    objr <cmd> [key=val] [key==val]
+    objr [-a] [-c] [-d] [-h] [-v]
+
+COMMANDS
+
+    cmd    list available commands
+    mod    list available modules
+
+USAGE
+
+    $ objr [cmnd] mod=module1,module2,module3
+    $ objr -c mod=module1,module2,module3
+
+OPTIONS
+
+    -a     load all modules
+    -c     start console
+    -d     start daemon
+    -h     display help
+    -v     use verbose
+"""
 
 
 import getpass
 import os
 import pwd
+import readline # pylint: disable=W0611
 import sys
+import termios
 import time
 
 
-from objr import Default, Workdir, forever, init
-from objd import modules
+sys.path.insert(0, os.getcwd())
 
 
-Cfg         = Default()
-Cfg.mod     = "irc,rss"
-Cfg.name    = "objd"
-Cfg.version = "540"
-Cfg.wd      = os.path.expanduser(f"~/.{Cfg.name}")
-Cfg.pidfile = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
-Workdir.wd = Cfg.wd
+from mods.broker import Broker
 
 
-dte = time.ctime(time.time()).replace("  ", " ")
+broker = Broker()
+
+
+from objx import Default, Workdir, cdir, skel
+from objr import Client, Command, Event, cmnd, errors, parse_cmd, spl
+
+
+Cfg             = Default()
+Cfg.mod         = "cmd,mod"
+Cfg.name        = sys.argv[0].split(os.sep)[-1]
+Cfg.wd          = os.path.expanduser(f"~/.{Cfg.name}")
+Cfg.pidfile     = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
+Workdir.workdir = Cfg.wd
+
+
+if os.path.exists("mods"):
+    import mods
+else:
+    mods = None
+
+
+dte    = time.ctime(time.time()).replace("  ", " ")
+
+
+class Console(Client):
+
+    def announce(self, txt):
+        pass
+
+    def callback(self, evt):
+        Client.callback(self, evt)
+        evt.wait()
+
+    def poll(self):
+        evt = Event()
+        evt.orig = object.__repr__(self)
+        evt.txt = input("> ")
+        evt.type = "command"
+        return evt
+
+    def say(self, channel, txt):
+        txt = txt.encode('utf-8', 'replace').decode()
+        print(txt)
+
+
+"utilities"
 
 
 def daemon(pidfile, verbose=False):
@@ -50,9 +112,27 @@ def daemon(pidfile, verbose=False):
     os.chdir("/")
     if os.path.exists(pidfile):
         os.unlink(pidfile)
-    Workdir.cdir(os.path.dirname(pidfile))
+    cdir(os.path.dirname(pidfile))
     with open(pidfile, "w", encoding="utf-8") as fds:
         fds.write(str(os.getpid()))
+
+
+def debug(txt):
+    print(txt)
+
+
+def init(pkg, modstr, disable="", wait=False):
+    mds = []
+    for modname in spl(modstr):
+        if modname in spl(disable):
+            continue
+        module = getattr(pkg, modname, None)
+        if not module:
+            continue
+        if "init" in dir(module):
+            module.init()
+            mds.append(module)
+    return mds
 
 
 def privileges(username):
@@ -61,17 +141,57 @@ def privileges(username):
     os.setuid(pwnam.pw_uid)
 
 
+def wrap(func):
+    old2 = None
+    try:
+        old2 = termios.tcgetattr(sys.stdin.fileno())
+    except termios.error:
+        pass
+    try:
+        func()
+    except (KeyboardInterrupt, EOFError):
+        print("")
+    finally:
+        if old2:
+            termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old2)
+
+
 "runtime"
 
 
 def main():
-    Workdir.skel()
+    skel()
+    parse_cmd(Cfg, " ".join(sys.argv[1:]))
+    if 'a' in Cfg.opts:
+        Cfg.mod = ",".join(mods.__dir__())
+    if "v" in Cfg.opts:
+        debug(f"{Cfg.name.upper()} {Cfg.opts.upper()} started {dte}")
+    if "h" in Cfg.opts:
+        print(__doc__)
+        return
+    if "c" in Cfg.opts:
+        init(mods, Cfg.mod, Cfg.sets.dis, True)
+        csl = Console()
+        csl.start()
+        while 1:
+            time.sleep(1.0)
+        return
+    if 'x' in Cfg.opts:
+        return cmnd(Cfg.otxt, print)
+    Cfg.mod = ",".join(mods.__dir__())
     Cfg.user = getpass.getuser()
-    daemon(Cfg.pidfile, True)
+    daemon(Cfg.pidfile, "v" in Cfg.opts)
     privileges(Cfg.user)
-    init(modules, Cfg.mod)
-    forever()
+    init(mods, Cfg.mod, Cfg.sets.dis, True)
+    while 1:
+        time.sleep(1.0)
+    return
+
+
+def wrapped():
+    wrap(main)
+    errors()
 
 
 if __name__ == "__main__":
-    main()
+    wrapped()

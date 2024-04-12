@@ -10,7 +10,8 @@ import threading
 import time
 
 
-from objr import Client, Object, laps, update
+from objx import Object, update
+from objr import Command, laps
 
 
 STARTTIME = time.time()
@@ -40,4 +41,4 @@ def thr(event):
         event.reply('no threads')
 
 
-Client.add(thr)
+Command.add(thr)

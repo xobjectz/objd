@@ -18,39 +18,44 @@ import time
 import _thread
 
 
-from objr import Default, Object, edit, fmt, keys
-from objr import Broker,Client, Errors, Persist, Event
-from objr import debug, last, launch, sync
+from objx import Default, Object, edit, fmt, keys, last, sync, whitelist
+from objr import Client, Command, Event, command, later, launch
 
 
-NAME    = __file__.split(os.sep)[-3]
-get     = Broker.get
-saylock = _thread.allocate_lock()
+from .broker import broker
 
 
-Errors.filter = ["PING", "PONG", "PRIVMSG"]
+NAME       = __file__.split(os.sep)[-3]
+filterlist = ["PING", "PONG", "PRIVMSG"]
+saylock    = _thread.allocate_lock()
 
 
 myirc = None
 
 
+def debug(txt):
+    for flt in filterlist:
+        if flt in txt:
+            return
+    print(txt)
+
+
 def init():
     global myirc
     irc = IRC()
-    myirc = object.__repr__(irc)
     irc.start()
     irc.events.joined.wait()
+    myirc = irc
     return irc
 
 
 def shutdown():
     debug(f"IRC stopping {myirc}")
-    irc = Broker.get(myirc)
-    if irc:
-        irc.state.pongcheck = True
-        irc.state.keeprunning = False
-        irc.events.connected.clear()
-        irc.stop()
+    if myirc:
+        myirc.state.pongcheck = True
+        myirc.state.keeprunning = False
+        myirc.events.connected.clear()
+        myirc.stop()
 
 
 class Config(Default):
@@ -81,7 +86,7 @@ class Config(Default):
         self.username = self.username or Config.username
 
 
-Persist.add(Config)
+whitelist(Config)
 
 
 class TextWrap(textwrap.TextWrapper):
@@ -193,7 +198,7 @@ class IRC(Client, Output):
         self.register('PRIVMSG', cb_privmsg)
         self.register('QUIT', cb_quit)
         self.register("366", cb_ready)
-        Broker.add(self)
+        broker.add(self)
 
     def announce(self, txt):
         for channel in self.channels:
@@ -256,7 +261,7 @@ class IRC(Client, Output):
                ) as ex:
             pass
         except Exception as ex:
-            Errors.add(ex)
+            later(ex)
 
     def doconnect(self, server, nck, port=6667):
         while 1:
@@ -408,7 +413,7 @@ class IRC(Client, Output):
                     ConnectionResetError,
                     BrokenPipeError
                    ) as ex:
-                Errors.add(ex)
+                later(ex)
                 self.stop()
                 debug("handler stopped")
                 evt = self.event(str(ex))
@@ -435,7 +440,7 @@ class IRC(Client, Output):
                     ConnectionResetError,
                     BrokenPipeError
                    ) as ex:
-                Errors.add(ex)
+                later(ex)
                 self.stop()
                 return
         self.state.last = time.time()
@@ -502,21 +507,18 @@ class IRC(Client, Output):
         self.events.ready.wait()
 
 
-def cb_auth(evt):
-    bot = get(evt.orig)
+def cb_auth(bot, evt):
     bot.docommand(f'AUTHENTICATE {bot.cfg.password}')
 
 
-def cb_cap(evt):
-    bot = get(evt.orig)
+def cb_cap(bot, evt):
     if bot.cfg.password and 'ACK' in evt.arguments:
         bot.direct('AUTHENTICATE PLAIN')
     else:
         bot.direct('CAP REQ :sasl')
 
 
-def cb_error(evt):
-    bot = get(evt.orig)
+def cb_error(bot, evt):
     if not bot.state.nrerror:
         bot.state.nrerror = 0
     bot.state.nrerror += 1
@@ -524,46 +526,39 @@ def cb_error(evt):
     debug(evt.txt)
 
 
-def cb_h903(evt):
-    bot = get(evt.orig)
+def cb_h903(bot, evt):
     bot.direct('CAP END')
     bot.events.authed.set()
 
 
-def cb_h904(evt):
-    bot = get(evt.orig)
+def cb_h904(bot, evt):
     bot.direct('CAP END')
     bot.events.authed.set()
 
 
-def cb_kill(evt):
+def cb_kill(bot, evt):
     pass
 
 
-def cb_log(evt):
+def cb_log(bot, evt):
     pass
 
 
-def cb_ready(evt):
-    bot = get(evt.orig)
-    if bot:
-        bot.events.ready.set()
+def cb_ready(bot, evt):
+    bot.events.ready.set()
 
 
-def cb_001(evt):
-    bot = get(evt.orig)
+def cb_001(bot, evt):
     bot.logon()
 
 
-def cb_notice(evt):
-    bot = get(evt.orig)
+def cb_notice(bot, evt):
     if evt.txt.startswith('VERSION'):
         txt = f'\001VERSION {NAME.upper()} 140 - {bot.cfg.username}\001'
         bot.docommand('NOTICE', evt.channel, txt)
 
 
-def cb_privmsg(evt):
-    bot = get(evt.orig)
+def cb_privmsg(bot, evt):
     if not bot.cfg.commands:
         return
     if evt.txt:
@@ -576,14 +571,16 @@ def cb_privmsg(evt):
         if evt.txt:
             evt.txt = evt.txt[0].lower() + evt.txt[1:]
         debug(f"command from {evt.origin}: {evt.txt}")
-        bot.command(evt)
+        command(bot, evt)
 
 
-def cb_quit(evt):
-    bot = get(evt.orig)
+def cb_quit(bot, evt):
     debug(f"quit from {bot.cfg.server}")
     if evt.orig and evt.orig in bot.zelf:
         bot.stop()
+
+
+"commands"
 
 
 def cfg(event):
@@ -603,14 +600,14 @@ def cfg(event):
         event.reply('ok')
 
 
-Client.add(cfg)
+Command.add(cfg)
 
 
 def mre(event):
     if not event.channel:
         event.reply('channel is not set.')
         return
-    bot = Broker.get(event.orig)
+    bot = broker.get(event.orig)
     if 'cache' not in dir(bot):
         event.reply('bot is missing cache')
         return
@@ -625,7 +622,7 @@ def mre(event):
     event.reply(f'{size} more in cache')
 
 
-Client.add(mre)
+Command.add(mre)
 
 
 def pwd(event):
@@ -641,4 +638,4 @@ def pwd(event):
     event.reply(dcd)
 
 
-Client.add(pwd)
+Command.add(pwd)

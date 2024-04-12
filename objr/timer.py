@@ -3,17 +3,19 @@
 # pylint: disable=C,R,W0105
 
 
-"repeater"
+"timer"
 
 
-import time
 import threading
+import time
 
 
-from .threads import launch
+from .thread import launch
 
 
 class Timer:
+
+    "run a function at a specific time."
 
     def __init__(self, sleep, func, *args, thrname=None):
         self.args  = args
@@ -24,10 +26,12 @@ class Timer:
         self.timer = None
 
     def run(self):
+        "run the payload in a thread."
         self.state["latest"] = time.time()
         launch(self.func, *self.args)
 
     def start(self):
+        "start timer."
         timer = threading.Timer(self.sleep, self.run)
         timer.name   = self.name
         timer.daemon = True
@@ -40,25 +44,6 @@ class Timer:
         self.timer   = timer
 
     def stop(self):
+        "stop timer."
         if self.timer:
             self.timer.cancel()
-
-
-class Repeater(Timer):
-
-    def run(self):
-        launch(self.start)
-        super().run()
-
-
-"interface"
-
-
-def __dir__():
-    return (
-        'Repeater',
-        'Timer'
-    )
-
-
-__all__ = __dir__()
