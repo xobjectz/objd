@@ -13,7 +13,7 @@ import sys
 
 
 SKIP = [
-    "run"
+    "broker"
 ]
 
 
@@ -48,4 +48,4 @@ def import_pkg(dname, pname=""):
         modules.append(nam)
 
 
-import_pkg(os.path.dirname(__file__), "mods")
+import_pkg(os.path.dirname(__file__), "objd")

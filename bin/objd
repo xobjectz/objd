@@ -42,14 +42,11 @@ import time
 sys.path.insert(0, os.getcwd())
 
 
-from mods.broker import Broker
-
-
-broker = Broker()
-
-
 from objx import Default, Workdir, cdir, skel
 from objr import Client, Command, Event, cmnd, errors, parse_cmd, spl
+
+
+import objd
 
 
 Cfg             = Default()
@@ -58,12 +55,6 @@ Cfg.name        = sys.argv[0].split(os.sep)[-1]
 Cfg.wd          = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile     = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
 Workdir.workdir = Cfg.wd
-
-
-if os.path.exists("mods"):
-    import mods
-else:
-    mods = None
 
 
 dte    = time.ctime(time.time()).replace("  ", " ")
@@ -163,14 +154,14 @@ def main():
     skel()
     parse_cmd(Cfg, " ".join(sys.argv[1:]))
     if 'a' in Cfg.opts:
-        Cfg.mod = ",".join(mods.__dir__())
+        Cfg.mod = ",".join(objd.__dir__())
     if "v" in Cfg.opts:
         debug(f"{Cfg.name.upper()} {Cfg.opts.upper()} started {dte}")
     if "h" in Cfg.opts:
         print(__doc__)
         return
     if "c" in Cfg.opts:
-        init(mods, Cfg.mod, Cfg.sets.dis, True)
+        init(objd, Cfg.mod, Cfg.sets.dis, True)
         csl = Console()
         csl.start()
         while 1:
@@ -178,11 +169,11 @@ def main():
         return
     if 'x' in Cfg.opts:
         return cmnd(Cfg.otxt, print)
-    Cfg.mod = ",".join(mods.__dir__())
+    Cfg.mod = ",".join(objd.__dir__())
     Cfg.user = getpass.getuser()
     daemon(Cfg.pidfile, "v" in Cfg.opts)
     privileges(Cfg.user)
-    init(mods, Cfg.mod, Cfg.sets.dis, True)
+    init(objd, Cfg.mod, Cfg.sets.dis, True)
     while 1:
         time.sleep(1.0)
     return

@@ -1,8 +1,12 @@
+README
+######
+
+
 NAME
 
 ::
 
-    OBJD - objects daemon
+    OBJD - object daemon
 
 
 SYNOPSIS
@@ -128,7 +132,7 @@ SYSTEMD
     replace "<user>" with the user running pipx
 
     [Unit]
-    Description=objects daemon
+    Description=object daemon
     Requires=network-online.target
     After=network-online.target
 
