@@ -168,7 +168,7 @@ AUTHOR
 
 ::
 
-    Bart Thate <objx@proton.me>
+    Bart Thate <bthate@dds.nl>
 
 COPYRIGHT
 
