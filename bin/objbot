@@ -5,7 +5,7 @@
 # ruff: noqa: E402
 
 
-"daemon"
+"bot"
 
 
 import getpass
@@ -17,6 +17,9 @@ import termios
 import time
 
 
+sys.path.insert(0, os.getcwd())
+
+
 from objx import Default, Workdir, cdir, skel
 from objr import Client, Command, Event, cmnd, errors, parse_cmd, spl
 
@@ -25,15 +28,35 @@ import objd
 
 
 Cfg             = Default()
-Cfg.mod         = ",".join(objd.__dir__())
 Cfg.mod         = "cmd,mod"
 Cfg.name        = sys.argv[0].split(os.sep)[-1]
-Cfg.pidfile     = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
-Cfg.user        = getpass.getuser()
 Cfg.wd          = os.path.expanduser(f"~/.{Cfg.name}")
-
-
+Cfg.pidfile     = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
 Workdir.workdir = Cfg.wd
+
+
+dte    = time.ctime(time.time()).replace("  ", " ")
+
+
+class Console(Client):
+
+    def announce(self, txt):
+        pass
+
+    def callback(self, evt):
+        Client.callback(self, evt)
+        evt.wait()
+
+    def poll(self):
+        evt = Event()
+        evt.orig = object.__repr__(self)
+        evt.txt = input("> ")
+        evt.type = "command"
+        return evt
+
+    def say(self, channel, txt):
+        txt = txt.encode('utf-8', 'replace').decode()
+        print(txt)
 
 
 def daemon(pidfile, verbose=False):
@@ -60,6 +83,10 @@ def daemon(pidfile, verbose=False):
         fds.write(str(os.getpid()))
 
 
+def debug(txt):
+    print(txt)
+
+
 def init(pkg, modstr, disable="", wait=False):
     mds = []
     for modname in spl(modstr):
@@ -80,17 +107,57 @@ def privileges(username):
     os.setuid(pwnam.pw_uid)
 
 
+def wrap(func):
+    old2 = None
+    try:
+        old2 = termios.tcgetattr(sys.stdin.fileno())
+    except termios.error:
+        pass
+    try:
+        func()
+    except (KeyboardInterrupt, EOFError):
+        print("")
+    finally:
+        if old2:
+            termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old2)
+
+
 "runtime"
 
 
 def main():
     skel()
-    daemon(Cfg.pidfile, "v" in Cfg.opts)
-    privileges(Cfg.user)
-    init(objd, Cfg.mod, Cfg.sets.dis, True)
-    while 1:
-        time.sleep(1.0)
+    parse_cmd(Cfg, " ".join(sys.argv[1:]))
+    if Cfg.txt:
+        return cmnd(Cfg.otxt, print)
+    if 'a' in Cfg.opts:
+        Cfg.mod = ",".join(objd.__dir__())
+    if "v" in Cfg.opts:
+        debug(f"{Cfg.name.upper()} {Cfg.opts.upper()} started {dte}")
+    if 'd' in Cfg.opts:
+        Cfg.mod = ",".join(objd.__dir__())
+        Cfg.user = getpass.getuser()
+        daemon(Cfg.pidfile, "v" in Cfg.opts)
+        privileges(Cfg.user)
+        init(objd, Cfg.mod, Cfg.sets.dis, True)
+        while 1:
+            time.sleep(1.0)
+        return
+    if "c" in Cfg.opts:
+        init(objd, Cfg.mod, Cfg.sets.dis, True)
+        csl = Console()
+        csl.start()
+        while 1:
+            time.sleep(1.0)
+        return
+    if Cfg.otxt:
+        cmnd(Cfg.otxt, print)
+
+
+def wrapped():
+    wrap(main)
+    errors()
 
 
 if __name__ == "__main__":
-    main()
+    wrapped()
