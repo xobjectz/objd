@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # This file is placed in the Public Domain.
 #
-# pylint: disable=C,R,W0105
+# pylint: disable=W0212,W0406
 # ruff: noqa: E402
 
 
@@ -11,14 +11,12 @@
 import getpass
 import os
 import pwd
-import readline # pylint: disable=W0611
 import sys
-import termios
 import time
 
 
 from objx import Default, Workdir, cdir, skel
-from objr import Client, Command, Event, cmnd, errors, parse_cmd, spl
+from objr import spl
 
 
 import objd
@@ -26,17 +24,17 @@ import objd
 
 Cfg             = Default()
 Cfg.mod         = ",".join(objd.__dir__())
-Cfg.mod         = "cmd,mod"
-Cfg.name        = sys.argv[0].split(os.sep)[-1]
-Cfg.pidfile     = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
+Cfg.name        = "objd"
 Cfg.user        = getpass.getuser()
 Cfg.wd          = os.path.expanduser(f"~/.{Cfg.name}")
+Cfg.pidfile     = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
 
 
 Workdir.workdir = Cfg.wd
 
 
 def daemon(pidfile, verbose=False):
+    "switch to the background."
     pid = os.fork()
     if pid != 0:
         os._exit(0)
@@ -60,11 +58,10 @@ def daemon(pidfile, verbose=False):
         fds.write(str(os.getpid()))
 
 
-def init(pkg, modstr, disable="", wait=False):
+def init(pkg, modstr):
+    "run init in modules."
     mds = []
     for modname in spl(modstr):
-        if modname in spl(disable):
-            continue
         module = getattr(pkg, modname, None)
         if not module:
             continue
@@ -75,19 +72,18 @@ def init(pkg, modstr, disable="", wait=False):
 
 
 def privileges(username):
+    "drop privileges."
     pwnam = pwd.getpwnam(username)
     os.setgid(pwnam.pw_gid)
     os.setuid(pwnam.pw_uid)
 
 
-"runtime"
-
-
 def main():
+    "main"
     skel()
-    daemon(Cfg.pidfile, "v" in Cfg.opts)
+    daemon(Cfg.pidfile, "-v" in sys.argv)
     privileges(Cfg.user)
-    init(objd, Cfg.mod, Cfg.sets.dis, True)
+    init(objd, Cfg.mod)
     while 1:
         time.sleep(1.0)
 
