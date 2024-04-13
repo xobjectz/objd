@@ -15,9 +15,7 @@ import sys
 
 from objx import Default, Workdir, skel
 from objr import cmnd, parse_cmd
-
-
-import objd
+from objd import modules
 
 
 Cfg             = Default()

@@ -17,13 +17,11 @@ import time
 
 from objx import Default, Workdir, cdir, skel
 from objr import spl
-
-
-import objd
+from objd import modules
 
 
 Cfg             = Default()
-Cfg.mod         = ",".join(objd.__dir__())
+Cfg.mod         = ",".join(modules.__dir__())
 Cfg.name        = "objd"
 Cfg.user        = getpass.getuser()
 Cfg.wd          = os.path.expanduser(f"~/.{Cfg.name}")
@@ -83,7 +81,7 @@ def main():
     skel()
     daemon(Cfg.pidfile, "-v" in sys.argv)
     privileges(Cfg.user)
-    init(objd, Cfg.mod)
+    init(modules, Cfg.mod)
     while 1:
         time.sleep(1.0)
 

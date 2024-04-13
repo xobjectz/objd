@@ -25,7 +25,7 @@ from objr import Client, Command, Event, command, later, launch
 from .broker import broker
 
 
-NAME       = __file__.split(os.sep)[-2]
+NAME       = __file__.split(os.sep)[-3]
 filterlist = ["PING", "PONG", "PRIVMSG"]
 saylock    = _thread.allocate_lock()
 
