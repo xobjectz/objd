@@ -13,8 +13,9 @@ SYNOPSIS
 
 ::
 
-    objd <cmd> [key=val] [key==val]
-    objd [-a] [-c] [-d] [-h] [-v] [-w]
+    objctl <cmd> [key=val] [key==val]
+    objctl [-a] [-c] [-d] [-h] [-v] [-w]
+    objd
 
     options are:
 
@@ -56,57 +57,36 @@ USAGE
     $ objd
     $
 
-    with arguments the bot will run it as a command, use `cmd` to see list
-    of commands
+    use the ``objctl`` program to configure ``objd``
 
-    $ objd cmd
-    cmd,err,mod,req,thr,ver
-
-    list of modules
-
-    $ objd mod
-    cmd,err,fnd,irc,log,mod,req,rss,tdo,thr
-
-    use -c to start a console
-
-    $ objd -c
-
-    use mod=<name1,name2> to load additional modules
-
-    $ objd -c mod=irc,rss
-    >
-
-    use -v for verbose
-
-    $ objd -cv mod=irc
-    OBJD started CV started Sat Dec 2 17:53:24 2023
-    >
+    $ objctl cmd
+    cfg,cmd,dne,dpl,err,flt,log,mod,mre,nme,pwd,rem,req,res,rss,tdo,thr,tmr
 
 
 CONFIGURATION
 
 ::
 
-    $ objd cfg 
+    $ objctl cfg 
     channel=#zbot commands=True nick=zbot port=6667 server=localhost
 
     irc
 
-    $ objd cfg server=<server>
-    $ objd cfg channel=<channel>
-    $ objd cfg nick=<nick>
+    $ objctl cfg server=<server>
+    $ objctl cfg channel=<channel>
+    $ objctl cfg nick=<nick>
 
     sasl
 
-    $ objd pwd <nsvnick> <nspass>
-    $ objd cfg password=<frompwd>
+    $ objctl pwd <nsvnick> <nspass>
+    $ objctl cfg password=<frompwd>
 
     rss
 
-    $ objd rss <url>
-    $ objd dpl <url> <item1,item2>
-    $ objd rem <url>
-    $ objd nme <url> <name>
+    $ objctl rss <url>
+    $ objctl dpl <url> <item1,item2>
+    $ objctl rem <url>
+    $ objctl nme <url> <name>
 
 COMMANDS
 
@@ -161,6 +141,7 @@ FILES
 ::
 
     ~/.objd
+    ~/.local/bin/objctl
     ~/.local/bin/objd
     ~/.local/pipx/venvs/objd/
 

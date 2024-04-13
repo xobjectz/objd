@@ -15,7 +15,7 @@ from objx import find, sync, update, whitelist
 from objr import Command, Event, Timer, launch, laps
 
 
-from .broker import broker, debug
+from .broker import broker
 
 
 def init():

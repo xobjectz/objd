@@ -25,7 +25,6 @@ def __dir__():
         'Timer',
         'cmnd',
         'command',
-        'debug',
         'parse_cmd',
         'launch',
         'laps',

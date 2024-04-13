@@ -33,6 +33,8 @@ classifiers = [
 
 [tool.setuptools]
 script-files = [
+    'bin/objctl',
+    'bin/objbot',
     'bin/objd',
 ]
 packages = [

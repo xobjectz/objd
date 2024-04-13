@@ -17,9 +17,6 @@ import termios
 import time
 
 
-sys.path.insert(0, os.getcwd())
-
-
 from objx import Default, Workdir, cdir, skel
 from objr import Client, Command, Event, cmnd, errors, parse_cmd, spl
 
@@ -29,7 +26,7 @@ import objd
 
 Cfg             = Default()
 Cfg.mod         = "cmd,mod"
-Cfg.name        = sys.argv[0].split(os.sep)[-1]
+Cfg.name        = "objd"
 Cfg.wd          = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile     = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
 Workdir.workdir = Cfg.wd

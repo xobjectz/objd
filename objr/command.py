@@ -6,7 +6,7 @@
 "command"
 
 
-from objx import Object
+from objx import Default, Object
 
 
 class Command:
