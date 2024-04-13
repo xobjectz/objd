@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "objd"
 description = "object daemon"
-version = "3"
+version = "4"
 authors = [
     {name = "Bart Thate",email = "bthate@dds.nl"},
 ]
@@ -34,7 +34,6 @@ classifiers = [
 [tool.setuptools]
 script-files = [
     'bin/objctl',
-    'bin/objbot',
     'bin/objd',
 ]
 packages = [
