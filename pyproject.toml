@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "objd"
 description = "object daemon"
-version = "4"
+version = "10"
 authors = [
     {name = "Bart Thate",email = "bthate@dds.nl"},
 ]
@@ -37,7 +37,8 @@ script-files = [
     'bin/objd',
 ]
 packages = [
-    "objd",
+    'objd',
+    'objd.modules'
 ]
 
 

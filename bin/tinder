@@ -22,9 +22,7 @@ sys.path.insert(0, os.getcwd())
 from objx import Default, Object, Workdir, keys, update
 from objr import Client, Command, Event, cmnd, errors
 from objr import laps, launch, parse_cmd
-
-
-import objd
+from objd import modules
 
 
 Cfg             = Default()
@@ -155,7 +153,7 @@ if __name__ == "__main__":
     parse_cmd(Cfg, " ".join(sys.argv[1:]))
     dte = time.ctime(time.time()).replace("  ", " ")
     cprint(f"{Cfg.name.upper()} {Cfg.opts.upper()} started {dte}")
-    Cfg.mod =  ",".join(objd.__dir__())
+    Cfg.mod =  ",".join(modules.__dir__())
     if "p" in Cfg.opts:
         profile.runctx(main.__code__, globals(), locals())
     else:
