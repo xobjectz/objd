@@ -3,6 +3,7 @@ README
 
 
 NAME
+====
 
 ::
 
@@ -10,6 +11,7 @@ NAME
 
 
 SYNOPSIS
+========
 
 ::
 
@@ -18,7 +20,7 @@ SYNOPSIS
 
 
 DESCRIPTION
-
+===========
 
 OBJD is a python3 irc bot, it can connect to IRC, fetch and display RSS
 feeds, take todo notes, keep a shopping list and log text. You can also
@@ -40,7 +42,7 @@ OBJD is Public Domain.
 
 
 USAGE
-
+=====
 
 without any argument the program starts a daemon
 
@@ -58,34 +60,45 @@ use the ``objctl`` program to configure ``objd``
 
 
 CONFIGURATION
+=============
 
-the ``cfg`` command is used to configure ``objd``::
+the ``cfg`` command is used to configure ``objd``
+
+::
 
     $ objctl cfg 
     channel=#objd commands=True nick=objd port=6667 server=localhost
 
 
-irc::
+irc
+
+::
 
     $ objctl cfg server=<server>
     $ objctl cfg channel=<channel>
     $ objctl cfg nick=<nick>
 
 
-sasl::
+sasl
+
+::
 
     $ objctl pwd <nsvnick> <nspass>
     $ objctl cfg password=<frompwd>
 
 
-rss::
+rss
+
+::
 
     $ objctl rss <url>
     $ objctl dpl <url> <item1,item2>
     $ objctl rem <url>
     $ objctl nme <url> <name>
 
+
 COMMANDS
+========
 
 list of commands
 
@@ -104,7 +117,9 @@ list of commands
     rss - add a feed
     thr - show the running threads
 
+
 SYSTEMD
+=======
 
 save the following it in /etc/systems/system/objd.service and
 replace "<user>" with the user running pipx
@@ -135,7 +150,9 @@ then run this::
 
 default channel/server is #objd on localhost
 
+
 FILES
+=====
 
 ::
 
@@ -144,13 +161,17 @@ FILES
     ~/.local/bin/objd
     ~/.local/pipx/venvs/objd/
 
+
 AUTHOR
+======
 
 ::
 
     Bart Thate <bthate@dds.nl>
 
+
 COPYRIGHT
+=========
 
 ::
 
