@@ -10,7 +10,7 @@
 import unittest
 
 
-from objd.rss import Parser
+from objd.modules.rss import Parser
 
 
 class TestAtom(unittest.TestCase):
