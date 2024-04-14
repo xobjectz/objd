@@ -51,12 +51,9 @@ without any argument the program starts a daemon
     $ objd
     $
 
-use the ``objctl`` program to configure ``objd``
 
-::
+use the ``objctl`` program to manage ``objd``
 
-    $ objctl cmd
-    cfg,cmd,dne,dpl,err,flt,log,mod,mre,nme,pwd,rem,req,res,rss,tdo,thr,tmr
 
 
 CONFIGURATION
@@ -101,6 +98,13 @@ COMMANDS
 ========
 
 list of commands
+
+::
+
+    $ objctl cmd
+    cfg,cmd,dne,dpl,err,flt,log,mod,mre,nme,pwd,rem,req,res,rss,tdo,thr,tmr
+
+descriptions
 
 ::
 
