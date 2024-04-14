@@ -107,6 +107,7 @@ COMMANDS
 SYSTEMD
 
 ::
+
     save the following it in /etc/systems/system/objd.service and
     replace "<user>" with the user running pipx
 
@@ -129,6 +130,7 @@ SYSTEMD
     WantedBy=default.target
 
 ::
+
     then run this::
 
     $ pipx ensurepath
