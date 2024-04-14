@@ -59,7 +59,7 @@ use the ``objctl`` program to configure ``objd``
 
 CONFIGURATION
 
-the ``cfg`` command is used to configure ``objd``
+the ``cfg`` command is used to configure ``objd``::
 
     $ objctl cfg 
     channel=#objd commands=True nick=objd port=6667 server=localhost
