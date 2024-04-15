@@ -108,7 +108,7 @@ SYSTEMD
 
 ::
 
-    save the following it in /etc/systems/system/objd.service and
+    save the following it in /etc/systems/systemd/objd.service and
     replace "<user>" with the user running pipx
 
 ::

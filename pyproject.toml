@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "objd"
 description = "object daemon"
-version = "10"
+version = "11"
 authors = [
     {name = "Bart Thate",email = "bthate@dds.nl"},
 ]
