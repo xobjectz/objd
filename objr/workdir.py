@@ -9,7 +9,7 @@
 import os
 
 
-from .object import Object, cdir
+from objx import Object, cdir
 
 
 class Workdir(Object):

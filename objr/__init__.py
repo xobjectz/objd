@@ -7,29 +7,45 @@
 
 
 from .client   import *
+from .command  import *
+from .default  import *
 from .errors   import *
 from .event    import *
 from .handler  import *
+from .persist  import *
 from .repeater import *
 from .thread   import *
 from .timer    import *
+from .workdir  import *
 
 
 def __dir__():
     return (
+        'Client',
+        'Command',
+        'Default',
         'Event',
         'Handler',
-        'Client',
+        'Persist',
         'Repeater',
         'Thread',
         'Timer',
+        'Workdir',
         'cmnd',
         'command',
-        'parse_cmd',
-        'launch',
+        'fetch',
+        'fntime',
+        'find',
         'laps',
+        'last',
+        'launch',
         'name',
-        'spl'
+        'long',
+        'ident',
+        'parse_cmd',
+        'spl',
+        'sync',
+        'whitelist'
     )
 
 

@@ -9,8 +9,8 @@
 import time
 
 
-from objx import Object, fntime, find, sync, whitelist
-from objr import Command, laps
+from objx import Object
+from objr import Command, fntime, find, laps, sync, whitelist
 
 
 class NoDate(Exception):

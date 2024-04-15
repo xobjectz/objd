@@ -9,8 +9,8 @@
 import time
 
 
-from objx import Object, find, fntime, sync, whitelist
-from objr import Command, laps
+from objx import Object
+from objr import Command, find, fntime, laps, sync, whitelist
 
 
 class Log(Object):

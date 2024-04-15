@@ -11,8 +11,10 @@ import os
 import time
 
 
+from objx  import Object, fqn, read, search, update, write
+
+
 from .default import Default
-from .object  import Object, fqn, read, search, update, write
 from .workdir import liststore, store, strip
 
 

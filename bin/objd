@@ -15,9 +15,10 @@ import sys
 import time
 
 
-from objx import Default, Workdir, cdir, skel
-from objr import spl
+from objx import cdir
+from objr import Default, Workdir, skel, spl
 from objd import modules
+
 
 
 Cfg             = Default()

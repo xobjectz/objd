@@ -6,8 +6,8 @@
 "locate"
 
 
-from objx import fmt, find, long, liststore, skel
-from objr import Command
+from objx import fmt
+from objr import Command, find, long, liststore, skel
 
 
 def fnd(event):

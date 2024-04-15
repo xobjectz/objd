@@ -11,8 +11,8 @@ import re
 import time as ttime
 
 
-from objx import find, sync, update, whitelist
-from objr import Command, Event, Timer, launch, laps
+from objx import update
+from objr import Command, Event, Timer, launch, find, laps, sync, whitelist
 
 
 from .broker import broker
