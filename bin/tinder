@@ -19,8 +19,8 @@ import _thread
 sys.path.insert(0, os.getcwd())
 
 
-from objx import Default, Object, Workdir, keys, update
-from objr import Client, Command, Event, cmnd, errors
+from objx import Object, keys, update
+from objr import Client, Command, Default, Event, Workdir, cmnd, errors
 from objr import laps, launch, parse_cmd
 from objd import modules
 
