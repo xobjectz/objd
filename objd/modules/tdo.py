@@ -1,6 +1,4 @@
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C,R,E0402
 
 
 "todo list"
@@ -10,47 +8,48 @@ import time
 
 
 from objx import Object
-from objr import Command, fntime, find, laps, sync, whitelist
+from objr import fntime, laps
+
+
+from objr.run import broker
 
 
 class NoDate(Exception):
 
-    pass
+    "no matching date"
 
 
-class Todo(Object):
+class Todo(Object): # pylint: disable=R0903
+
+    "Todo"
 
     def __init__(self):
         Object.__init__(self)
         self.txt = ''
 
 
-whitelist(Todo)
-
-
 def dne(event):
+    "flag todo as done."
     if not event.args:
         event.reply("dne <txt>")
         return
     selector = {'txt': event.args[0]}
     nmr = 0
-    for fnm, obj in find('todo', selector):
+    for fnm, obj in broker.find(selector, match="Todo"):
         nmr += 1
         obj.__deleted__ = True
-        sync(obj, fnm)
+        broker.add(obj, fnm)
         event.reply('ok')
         break
     if not nmr:
         event.reply("nothing todo")
 
 
-Command.add(dne)
-
-
 def tdo(event):
+    "add todo."
     if not event.rest:
         nmr = 0
-        for fnm, obj in find('todo'):
+        for fnm, obj in broker.all('todo'):
             lap = laps(time.time()-fntime(fnm))
             event.reply(f'{nmr} {obj.txt} {lap}')
             nmr += 1
@@ -59,8 +58,5 @@ def tdo(event):
         return
     obj = Todo()
     obj.txt = event.rest
-    sync(obj)
+    broker.add(obj)
     event.reply('ok')
-
-
-Command.add(tdo)

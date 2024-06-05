@@ -6,7 +6,7 @@ NAME
 
 ::
 
-    OBJD - object daemon
+    OBJD - objects daemon
 
 
 SYNOPSIS
@@ -26,7 +26,7 @@ DESCRIPTION
     copy/paste the service file and run it under systemd for 24/7 presence
     in a IRC channel.
 
-    OBJD users OBJR, containing all the python3 code to program a unix cli
+    OBJD uses OBJR, containing all the python3 code to program a unix cli
     program, such as disk perisistence for configuration files, event handler
     to handle the client/server connection, code to introspect modules for
     commands, deferred exception handling to not crash on an error, a parser

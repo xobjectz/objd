@@ -1,11 +1,10 @@
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C,R,W0105
 
 
 "rich site syndicate"
 
 
+import html
 import html.parser
 import re
 import time
@@ -18,12 +17,14 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus, urlencode
 
 
-from objx import Object, fmt, update, values
-from objr import Command, Default, Repeater, find, fntime, last, laps, launch, spl, sync
-from objr import whitelist
+from objx import Default, Object, fmt, update, values
 
 
-from .broker import broker
+from objr.broker import fntime
+from objr.client import laps
+from objr.run    import broker
+from objr.thread import Repeater, launch
+from objr.utils  import spl
 
 
 def init():
@@ -33,26 +34,18 @@ def init():
     return fetcher
 
 
-fetchlock = _thread.allocate_lock()
-
-
 DEBUG = False
 
 
-TEMPLATE = """<opml version="1.0">
-    <head>
-        <title>rssbot opml</title>
-    </head>
-    <body>
-        <outline title="rssbot opml" text="24/7 feed fetcher">"""
+fetchlock = _thread.allocate_lock()
 
 
-class Feed(Default):
+class Feed(Default): # pylint: disable=R0903
 
     "Feed"
 
 
-class Rss(Default):
+class Rss(Default): # pylint: disable=R0903
 
     "Rss"
 
@@ -62,7 +55,7 @@ class Rss(Default):
         self.rss          = ''
 
 
-class Seen(Default):
+class Seen(Default): # pylint: disable=R0903
 
     "Seen"
 
@@ -121,10 +114,10 @@ class Fetcher(Object):
                 self.seen.urls.append(uurl)
                 counter += 1
                 if self.dosave:
-                    sync(fed)
+                    broker.add(fed)
                 result.append(fed)
-        if result:
-            sync(self.seen, self.seenfn)
+        #if result:
+        #    broker.add(self.seen, self.seenfn)
         txt = ''
         feedname = getattr(feed, 'name', None)
         if feedname:
@@ -139,13 +132,13 @@ class Fetcher(Object):
     def run(self):
         "fetch all feeds."
         thrs = []
-        for _fn, feed in find('rss'):
+        for _fn, feed in broker.all('rss'):
             thrs.append(launch(self.fetch, feed, name=f"{feed.rss}"))
         return thrs
 
     def start(self, repeat=True):
         "start fetcher."
-        self.seenfn = last(self.seen)
+        self.seenfn = broker.last(self.seen)
         if repeat:
             repeater = Repeater(300.0, self.run)
             repeater.start()
@@ -154,40 +147,6 @@ class Fetcher(Object):
 class Parser:
 
     "Parser"
-
-    @staticmethod
-    def getvalue(line, attr):
-        "retrieve attribute value."
-        lne = ''
-        index1 = line.find(f'{attr}="')
-        if index1 == -1:
-            return lne
-        index1 += len(attr) + 2
-        index2 = line.find('"', index1)
-        if index2 == -1:
-            index2 = line.find('"/>', index1)
-        if index2 == -1:
-            return lne
-        lne = line[index1:index2]
-        if 'CDATA' in lne:
-            lne = lne.replace('![CDATA[', '')
-            lne = lne.replace(']]', '')
-            #lne = lne[1:-1]
-        return lne
-
-    @staticmethod
-    def getattrs(line, token):
-        "split for attributes."
-        result = ""
-        index1 = line.find(f'<{token} ')
-        if index1 == -1:
-            return result
-        index1 += len(token) + 2
-        index2 = line.find('/>', index1)
-        if index2 == -1:
-            return result
-        result = line[index1:index2]
-        return result.strip()
 
     @staticmethod
     def getitem(line, item):
@@ -201,10 +160,7 @@ class Parser:
         if index2 == -1:
             return lne
         lne = line[index1:index2]
-        if 'CDATA' in lne:
-            lne = lne.replace('![CDATA[', '')
-            lne = lne.replace(']]', '')
-            lne = lne[1:-1]
+        lne = cdata(lne)
         return lne.strip()
 
     @staticmethod
@@ -240,18 +196,6 @@ class Parser:
                     val = val.replace("\n", "")
                     val = striphtml(val)
                     setattr(obj, itm, val)
-                else:
-                    att = Parser.getattrs(line, toke)
-                    if not att:
-                        continue
-                    if itm == "link":
-                        itm = "href"
-                    val = Parser.getvalue(att, itm)
-                    if not val:
-                        continue
-                    if itm == "href":
-                        itm = "link"
-                    setattr(obj, itm, val.strip())
             result.append(obj)
         return result
 
@@ -272,6 +216,7 @@ def getfeed(url, items):
             result = Parser.parse(str(rest.data, 'utf-8'), 'item', items) or []
     return result
 
+
 def gettinyurl(url):
     "fetch a tinyurl."
     postarray = [
@@ -289,6 +234,16 @@ def gettinyurl(url):
             if i:
                 return i.groups()
     return []
+
+
+def cdata(line):
+    "retrieve text from CDATA."
+    if 'CDATA' in line:
+        lne = line.replace('![CDATA[', '')
+        lne = lne.replace(']]', '')
+        lne = lne[1:-1]
+        return lne
+    return line
 
 
 def geturl(url):
@@ -320,34 +275,16 @@ def useragent(txt):
     return 'Mozilla/5.0 (X11; Linux x86_64) ' + txt
 
 
-"commands"
-
-
 def dpl(event):
     "set display items."
     if len(event.args) < 2:
         event.reply('dpl <stringinurl> <item1,item2>')
         return
     setter = {'display_list': event.args[1]}
-    for _fn, feed in find('rss', {'rss': event.args[0]}):
+    for _fn, feed in broker.find({'rss': event.args[0]}):
         if feed:
             update(feed, setter)
-            sync(feed)
     event.reply('ok')
-
-
-def exp(event):
-    "export to opml."
-    event.reply(TEMPLATE)
-    nrs = 0
-    for _fn, obj in find("rss"):
-        nrs += 1
-        name = obj.name or f"url{nrs}"
-        txt = f'<outline name={name} display_list={obj.display_list} xmlUrl="{obj.rss}"/>'
-        event.reply(" "*12 + txt)
-    event.reply(" "*8 + "</outline>")
-    event.reply("    <body>")
-    event.reply("</opml>")
 
 
 def nme(event):
@@ -356,10 +293,9 @@ def nme(event):
         event.reply('nme <stringinurl> <name>')
         return
     selector = {'rss': event.args[0]}
-    for _fn, feed in find('rss', selector):
+    for _fn, feed in broker.find(selector):
         if feed:
             feed.name = event.args[1]
-            sync(feed)
     event.reply('ok')
 
 
@@ -369,10 +305,10 @@ def rem(event):
         event.reply('rem <stringinurl>')
         return
     selector = {'rss': event.args[0]}
-    for fnm, feed in find('rss', selector):
+    for fnm, feed in broker.find('rss', selector):
         if feed:
             feed.__deleted__ = True
-            sync(feed, fnm)
+            broker.add(feed, fnm)
     event.reply('ok')
 
 
@@ -382,10 +318,10 @@ def res(event):
         event.reply('res <stringinurl>')
         return
     selector = {'rss': event.args[0]}
-    for fnm, feed in find('rss', selector, deleted=True):
+    for fnm, feed in broker.find('rss', selector, deleted=True):
         if feed:
             feed.__deleted__ = False
-            sync(feed, fnm)
+            broker.add(feed, fnm)
     event.reply('ok')
 
 
@@ -393,7 +329,7 @@ def rss(event):
     "add a feed."
     if not event.rest:
         nrs = 0
-        for fnm, feed in find('rss'):
+        for fnm, feed in broker.all('rss'):
             nrs += 1
             elp = laps(time.time()-fntime(fnm))
             txt = fmt(feed)
@@ -405,24 +341,11 @@ def rss(event):
     if 'http' not in url:
         event.reply('i need an url')
         return
-    for fnm, result in find('rss', {'rss': url}):
+    for fnm, result in broker.find({'rss': url}):
         if result:
             event.reply(f'already got {url}')
             return
     feed = Rss()
     feed.rss = event.args[0]
-    sync(feed)
+    broker.add(feed)
     event.reply('ok')
-
-
-"register"
-
-
-Command.add(dpl)
-Command.add(exp)
-Command.add(nme)
-Command.add(rem)
-Command.add(res)
-Command.add(rss)
-whitelist(Rss)
-whitelist(Seen)

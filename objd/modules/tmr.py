@@ -1,6 +1,4 @@
 # This file is placed in the Public Domain.
-#
-# pylint: disable=C,R,W0612,W0105,W0702,E0402
 
 
 "timer"
@@ -12,14 +10,17 @@ import time as ttime
 
 
 from objx import update
-from objr import Command, Event, Timer, launch, find, laps, sync, whitelist
 
 
-from .broker import broker
+from objr.client  import laps
+from objr.handler import Event
+from objr.run     import broker
+from objr.thread  import Timer, launch
 
 
 def init():
-    for fnm, obj in find("timer"):
+    "initialaze modules."
+    for _fnm, obj in broker.all("timer"):
         if "time" not in obj:
             continue
         diff = float(obj.time) - ttime.time()
@@ -59,23 +60,23 @@ FORMATS = [
 
 class NoDate(Exception):
 
-    pass
-
-
-whitelist(Timer)
+    "can't parse date."
 
 
 def extract_date(daystr):
+    "extract date from string."
+    res = None
     for fmt in FORMATS:
         try:
             res = ttime.mktime(ttime.strptime(daystr, fmt))
+            break
         except ValueError:
-            res = None
-        if res:
-            return res
+            pass
+    return res
 
 
 def get_day(daystr):
+    "return day from string."
     day = None
     month = None
     yea = None
@@ -95,12 +96,13 @@ def get_day(daystr):
         day = int(day)
         month = int(month)
         yea = int(yea)
-        date = "%s %s %s" % (day, MONTHS[month], yea)
+        date = f"{day} {MONTHS[month]} {yea}"
         return ttime.mktime(ttime.strptime(date, r"%d %b %Y"))
     raise NoDate(daystr)
 
 
 def get_hour(daystr):
+    "get hour from string."
     try:
         hmsre = re.search(r'(\d+):(\d+):(\d+)', str(daystr))
         hours = 60 * 60 * (int(hmsre.group(1)))
@@ -122,6 +124,7 @@ def get_hour(daystr):
 
 
 def get_time(txt):
+    "return time from string."
     try:
         target = get_day(txt)
     except NoDate:
@@ -133,6 +136,7 @@ def get_time(txt):
 
 
 def parse_time(txt):
+    "parse time from string."
     seconds = 0
     target = 0
     txt = str(txt)
@@ -155,9 +159,11 @@ def parse_time(txt):
 
 
 def to_day(daystr):
+    "scan string for day/time."
     previous = ""
     line = ""
     daystr = str(daystr)
+    res = None
     for word in daystr.split():
         line = previous + " " + word
         previous = word
@@ -166,21 +172,22 @@ def to_day(daystr):
         except ValueError:
             res = None
         if res:
-            return res
+            break
         line = ""
-
+    return res
 
 def today():
+    "return time of today."
     return str(datetime.datetime.today()).split()[0]
 
 
-"commands"
-
-
 def tmr(event):
+    "set timer."
+    # pylint: disable=R0912
+    res = None
     if not event.rest:
         nmr = 0
-        for fnm, obj in find('timer'):
+        for _fnm, obj in broker.all('timer'):
             if "time" not in obj:
                 continue
             lap = float(obj.time) - ttime.time()
@@ -189,7 +196,7 @@ def tmr(event):
                 nmr += 1
         if not nmr:
             event.reply("no timers")
-        return
+        return res
     seconds = 0
     line = ""
     for word in event.args:
@@ -197,8 +204,8 @@ def tmr(event):
             try:
                 seconds = int(word[1:])
             except (ValueError, IndexError):
-                event.reply("%s is not an integer" % seconds)
-                return
+                event.reply(f"{seconds} is not an integer")
+                return res
         else:
             line += word + " "
     if seconds:
@@ -213,7 +220,7 @@ def tmr(event):
             target += hour
     if not target or ttime.time() > target:
         event.reply("already passed given time.")
-        return
+        return res
     event.time = target
     diff = target - ttime.time()
     event.reply("ok " +  laps(diff))
@@ -221,8 +228,6 @@ def tmr(event):
     event.result.append(event.rest)
     timer = Timer(diff, event.show, thrname=event.cmd)
     update(timer, event)
-    sync(timer)
+    broker.add(timer)
     launch(timer.start)
-
-
-Command.add(tmr)
+    return res

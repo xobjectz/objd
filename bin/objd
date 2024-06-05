@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 # This file is placed in the Public Domain.
-#
-# pylint: disable=W0212,W0406
-# ruff: noqa: E402
 
 
 "daemon"
@@ -15,25 +12,27 @@ import sys
 import time
 
 
-from objx import cdir
-from objr import Default, Workdir, skel, spl
+from objx import Default, cdir
+from objr import Event, cmnd, errors, init, later, scan
 from objd import modules
 
 
+import objd
+
 
 Cfg             = Default()
-Cfg.mod         = ",".join(modules.__dir__())
+Cfg.dis         = ""
 Cfg.name        = "objd"
-Cfg.user        = getpass.getuser()
-Cfg.wd          = os.path.expanduser(f"~/.{Cfg.name}")
-Cfg.pidfile     = os.path.join(Cfg.wd, f"{Cfg.name}.pid")
+Cfg.mod         = "irc,rss"
+Cfg.version     = "558"
+Cfg.opts        = ""
+Cfg.wdr         = os.path.expanduser(f"~/.{Cfg.name}")
+Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 
 
-Workdir.workdir = Cfg.wd
-
-
-def daemon(pidfile, verbose=False):
-    "switch to the background."
+def daemon(verbose=False):
+    "switch to background."
+    # pylint: disable=W0212
     pid = os.fork()
     if pid != 0:
         os._exit(0)
@@ -50,24 +49,27 @@ def daemon(pidfile, verbose=False):
             os.dup2(ses.fileno(), sys.stderr.fileno())
     os.umask(0)
     os.chdir("/")
-    if os.path.exists(pidfile):
-        os.unlink(pidfile)
-    cdir(os.path.dirname(pidfile))
-    with open(pidfile, "w", encoding="utf-8") as fds:
+
+
+def getmods(path, modname="mods"):
+    "return modules"
+    path = os.path.dirname(path)
+    if path not in sys.path:
+        sys.path.insert(0, path)
+    return __import__(modname)
+
+
+def dontprint(_txt):
+    "don't print"
+
+
+def pidfile(path):
+    "create pidfile"
+    if os.path.exists(path):
+        os.unlink(path)
+    cdir(path)
+    with open(path, "w", encoding="utf-8") as fds:
         fds.write(str(os.getpid()))
-
-
-def init(pkg, modstr):
-    "run init in modules."
-    mds = []
-    for modname in spl(modstr):
-        module = getattr(pkg, modname, None)
-        if not module:
-            continue
-        if "init" in dir(module):
-            module.init()
-            mds.append(module)
-    return mds
 
 
 def privileges(username):
@@ -77,15 +79,36 @@ def privileges(username):
     os.setuid(pwnam.pw_uid)
 
 
+def wrap(func):
+    "restore console."
+    try:
+        func()
+    except (KeyboardInterrupt, EOFError):
+        if "-d" not in sys.argv:
+            print("")
+    except Exception as ex: # pylint: disable=W0718
+        later(ex)
+    if "v" in Cfg.opts:
+        errors()
+
+
 def main():
     "main"
-    skel()
-    daemon(Cfg.pidfile, "-v" in sys.argv)
+    Cfg.user = getpass.getuser()
+    if "-d" in sys.argv:
+        daemon("-v" in sys.argv)
+    pidfile(Cfg.pidfile)
     privileges(Cfg.user)
+    scan(modules, Cfg.mod)
+    path = os.path.join(os.path.dirname(objd.__file__), "feeds.opml")
+    if os.path.exists(path):
+        evt = Event()
+        evt.txt = f"imp {path}"
+        cmnd(evt, dontprint)
     init(modules, Cfg.mod)
     while 1:
         time.sleep(1.0)
 
 
 if __name__ == "__main__":
-    main()
+    wrap(main)
