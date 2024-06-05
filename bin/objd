@@ -88,7 +88,7 @@ def wrap(func):
             print("")
     except Exception as ex: # pylint: disable=W0718
         later(ex)
-    if "v" in Cfg.opts:
+    if "-v" in sys.argv:
         errors()
 
 
@@ -97,14 +97,13 @@ def main():
     Cfg.user = getpass.getuser()
     if "-d" in sys.argv:
         daemon("-v" in sys.argv)
-    pidfile(Cfg.pidfile)
+        pidfile(Cfg.pidfile)
     privileges(Cfg.user)
     scan(modules, Cfg.mod)
     path = os.path.join(os.path.dirname(objd.__file__), "feeds.opml")
     if os.path.exists(path):
-        evt = Event()
-        evt.txt = f"imp {path}"
-        cmnd(evt, dontprint)
+        txt = f"opm {path}"
+        cmnd(txt, dontprint)
     init(modules, Cfg.mod)
     while 1:
         time.sleep(1.0)
