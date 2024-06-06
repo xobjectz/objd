@@ -77,24 +77,6 @@ def cmnd(txt, outer):
     return evn
 
 
-def init(pkg, modstr, disable=""):
-    "start modules"
-    mds = []
-    for modname in spl(modstr):
-        if skip(modname, disable):
-            continue
-        mod = getattr(pkg, modname, None)
-        if not mod:
-            continue
-        if "init" in dir(mod):
-            try:
-                mod.init()
-                mds.append(mod)
-            except Exception as ex: # pylint: disable=W0718
-                later(ex)
-    return mds
-
-
 def laps(seconds, short=True):
     "show elapsed time."
     txt = ""
@@ -133,6 +115,37 @@ def laps(seconds, short=True):
         txt += f"{sec}s"
     txt = txt.strip()
     return txt
+
+
+def init(pkg, modstr, disable=""):
+    "start modules"
+    mds = []
+    for modname in spl(modstr):
+        if skip(modname, disable):
+            continue
+        mod = getattr(pkg, modname, None)
+        if not mod:
+            continue
+        if "init" in dir(mod):
+            try:
+                mod.init()
+                mds.append(mod)
+            except Exception as ex: # pylint: disable=W0718
+                later(ex)
+    return mds
+
+
+def scan(pkg, modstr, disable=""):
+    "scan modules for commands and classes"
+    mds = []
+    for modname in spl(modstr):
+        if skip(modname, disable):
+            continue
+        module = getattr(pkg, modname, None)
+        if not module:
+            continue
+        scancmd(module)
+    return mds
 
 
 def parse(obj, txt=None):
@@ -189,19 +202,6 @@ def parse(obj, txt=None):
         obj.txt = obj.cmd or ""
 
 
-def scan(pkg, modstr, disable=""):
-    "scan modules for commands and classes"
-    mds = []
-    for modname in spl(modstr):
-        if skip(modname, disable):
-            continue
-        module = getattr(pkg, modname, None)
-        if not module:
-            continue
-        scancmd(module)
-    return mds
-
-
 def scancmd(mod) -> None:
     "scan module for commands."
     for key, cmd in inspect.getmembers(mod, inspect.isfunction):
@@ -217,8 +217,8 @@ def __dir__():
         'Commands',
         'add',
         'command',
-        'init',
         'laps',
+        'init',
         'parse',
         'scan',
         'scancmd'
