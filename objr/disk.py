@@ -4,18 +4,18 @@
 "disk"
 
 
-import datetime
-import inspect
 import os
 import pathlib
 import _thread
 
 
-from .object import Object, fqn, ident, read, write
+from objx import Default, Object, fqn, ident, read, search, update, write
+
+
 from .utils  import fntime, strip
 
 
-disklock = _thread.allocate_lock()
+lock = _thread.allocate_lock()
 
 
 class Workdir(Object): # pylint: disable=R0903
@@ -27,7 +27,7 @@ class Workdir(Object): # pylint: disable=R0903
 
 def fetch(obj, pth):
     "read object from disk."
-    with disklock:
+    with lock:
         pth2 = store(pth)
         read(obj, pth2)
         return strip(pth)
@@ -35,7 +35,7 @@ def fetch(obj, pth):
 
 def find(mtc, selector=None, index=None, deleted=False):
     "find object matching the selector dict."
-    clz = long(mtc)
+    clz = mtc
     nrs = -1
     result = []
     for fnm in sorted(fns(clz), key=fntime):
@@ -101,7 +101,7 @@ def store(pth=""):
 
 def sync(obj, pth=None):
     "sync object to disk."
-    with disklock:
+    with lock:
         if pth is None:
             pth = ident(obj)
         pth2 = store(pth)
@@ -113,7 +113,7 @@ def __dir__():
     return (
         'fetch',
         'find',
-        'last',,
+        'last',
         'lsstore',
         'skel',
         'store',

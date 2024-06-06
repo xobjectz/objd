@@ -20,11 +20,9 @@ from urllib.parse import quote_plus, urlencode
 from objx import Default, Object, fmt, update, values
 
 
-from objr.broker import fntime
-from objr.client import laps
 from objr.run    import broker
 from objr.thread import Repeater, launch
-from objr.utils  import spl
+from objr.utils  import fntime, laps, spl
 
 
 def init():
@@ -305,7 +303,7 @@ def rem(event):
         event.reply('rem <stringinurl>')
         return
     selector = {'rss': event.args[0]}
-    for fnm, feed in broker.find('rss', selector):
+    for fnm, feed in broker.find(selector, match="rss"):
         if feed:
             feed.__deleted__ = True
             broker.add(feed, fnm)
@@ -318,7 +316,7 @@ def res(event):
         event.reply('res <stringinurl>')
         return
     selector = {'rss': event.args[0]}
-    for fnm, feed in broker.find('rss', selector, deleted=True):
+    for fnm, feed in broker.find(selector, match="rss", deleted=True):
         if feed:
             feed.__deleted__ = False
             broker.add(feed, fnm)
@@ -341,7 +339,7 @@ def rss(event):
     if 'http' not in url:
         event.reply('i need an url')
         return
-    for fnm, result in broker.find({'rss': url}):
+    for fnm, result in broker.find({'rss': url}, match="rss"):
         if result:
             event.reply(f'already got {url}')
             return

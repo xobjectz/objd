@@ -22,11 +22,14 @@ sys.path.insert(0, os.getcwd())
 from objx import Default, Object, keys
 
 
-from objr.client  import Client, Command, laps, parse
+from objr.client  import Client, scan
+from objr.command import Command
 from objr.handler import Event
 from objr.log     import debug, enable
+from objr.parse   import parse
 from objr.thread  import errors, launch
-from objd.main    import scan
+from objr.utils   import laps
+
 
 from objd import modules
 

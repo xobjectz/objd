@@ -12,11 +12,10 @@ import time as ttime
 from objx import update
 
 
-from objr.client  import laps
 from objr.handler import Event
 from objr.run     import broker
 from objr.thread  import Timer, launch
-
+from objr.utils   import laps
 
 def init():
     "initialaze modules."

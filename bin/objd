@@ -6,19 +6,17 @@
 
 
 import os
+import pwd
 import sys
-import termios
-import time
 
 
-from objx import Default
+from objx import Default, cdir
 
 
-from objr.client  import Client, cmnd, init, parse, scan
-from objr.handler import Event
-from objr.log     import debug, enable
-from objr.run     import broker
-from objr.thread  import errors, setout
+from objr.client  import init, scan
+from objr.parse   import parse
+from objr.thread  import setout
+from objr.utils   import forever
 
 
 from objd import modules
@@ -26,13 +24,13 @@ from objd import modules
 
 Cfg             = Default()
 Cfg.dis         = ""
-Cfg.mod         = "cmd,err,mod,thr,irc,rss"
 Cfg.opts        = ""
+Cfg.mod         = "cmd,err,mod,thr,irc,rss"
 Cfg.name        = __file__.rsplit(os.sep, maxsplit=1)[-1]
 Cfg.version     = "13"
 Cfg.wdr         = os.path.expanduser(f"~/.{Cfg.name}")
-Cfg.mdir        = os.path.join(Cfg.wdr, "mods")
 Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
+Cfg.mdir        = os.path.join(Cfg.wdr, "mods")
 
 
 def daemon(verbose=False):
@@ -56,11 +54,6 @@ def daemon(verbose=False):
     os.chdir("/")
 
 
-def forever():
-    while True:
-        time.sleep(1.0)
-
-
 def pidfile(path):
     "create pidfile"
     if os.path.exists(path):
@@ -79,12 +72,12 @@ def privileges(username):
 
 def main():
     "main"
+    setout(print)
     parse(Cfg, " ".join(sys.argv[1:]))
-    Cfg.mod = ",".join(dir(modules))
     daemon("v" in Cfg.opts)
+    pidfile(Cfg.pidfile)
     scan(modules, Cfg.mod, Cfg.sets.dis)
     init(modules, Cfg.mod, Cfg.sets.dis)
-    pidfile(Cfg.pidfile)
     forever()
 
 

@@ -18,7 +18,8 @@ import _thread
 from objx  import Default, Object, edit, fmt, keys, values
 
 
-from objr.client  import Client, command
+from objr.client  import Client
+from objr.command import command
 from objr.handler import Event
 from objr.log     import Logging, debug
 from objr.run     import broker
