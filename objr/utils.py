@@ -4,7 +4,31 @@
 "utilities"
 
 
+import time
 import uuid
+import _thread
+
+
+def fntime(daystr):
+    "convert file name to it's saved time."
+    daystr = daystr.replace('_', ':')
+    datestr = ' '.join(daystr.split(os.sep)[-2:])
+    if '.' in datestr:
+        datestr, rest = datestr.rsplit('.', 1)
+    else:
+        rest = ''
+    timed = time.mktime(time.strptime(datestr, '%Y-%m-%d %H:%M:%S'))
+    if rest:
+        timed += float('.' + rest)
+    return timed
+
+
+def forever():
+    while True:
+        try:
+            time.sleep(1.0)
+        except Exception as ex:
+            _thread.interrupt_main()
 
 
 def shortid():
@@ -31,6 +55,8 @@ def spl(txt):
 
 def __dir__():
     return (
+        'fntime',
+        'forever',
         'shortid',
         'skip',
         'spl'

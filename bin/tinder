@@ -22,11 +22,11 @@ sys.path.insert(0, os.getcwd())
 from objx import Default, Object, keys
 
 
-from objr.client  import Client, Command, laps, parse, scan
+from objr.client  import Client, Command, laps, parse
 from objr.handler import Event
 from objr.log     import debug, enable
 from objr.thread  import errors, launch
-
+from objd.main    import scan
 
 from objd import modules
 
@@ -48,7 +48,7 @@ Cfg.mod     = ""
 Cfg.name    = "tinder"
 Cfg.silent  = False
 Cfg.skip    = ["debug",]
-Cfg.version = "19"
+Cfg.version = "13"
 Cfg.wdr     = ".test"
 
 

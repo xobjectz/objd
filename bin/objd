@@ -5,28 +5,33 @@
 "daemon"
 
 
-import getpass
 import os
-import pwd
 import sys
+import termios
 import time
 
 
-from objx import Default, cdir
-from objr import Event, cmnd, errors, init, later, scan
+from objx import Default
+
+
+from objr.client  import Client, cmnd, init, parse, scan
+from objr.handler import Event
+from objr.log     import debug, enable
+from objr.run     import broker
+from objr.thread  import errors, setout
+
+
 from objd import modules
-
-
-import objd
 
 
 Cfg             = Default()
 Cfg.dis         = ""
-Cfg.name        = "objd"
-Cfg.mod         = "irc,rss"
-Cfg.version     = "558"
+Cfg.mod         = "cmd,err,mod,thr,irc,rss"
 Cfg.opts        = ""
+Cfg.name        = __file__.rsplit(os.sep, maxsplit=1)[-1]
+Cfg.version     = "13"
 Cfg.wdr         = os.path.expanduser(f"~/.{Cfg.name}")
+Cfg.mdir        = os.path.join(Cfg.wdr, "mods")
 Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
 
 
@@ -51,16 +56,9 @@ def daemon(verbose=False):
     os.chdir("/")
 
 
-def getmods(path, modname="mods"):
-    "return modules"
-    path = os.path.dirname(path)
-    if path not in sys.path:
-        sys.path.insert(0, path)
-    return __import__(modname)
-
-
-def dontprint(_txt):
-    "don't print"
+def forever():
+    while True:
+        time.sleep(1.0)
 
 
 def pidfile(path):
@@ -79,35 +77,16 @@ def privileges(username):
     os.setuid(pwnam.pw_uid)
 
 
-def wrap(func):
-    "restore console."
-    try:
-        func()
-    except (KeyboardInterrupt, EOFError):
-        if "-d" not in sys.argv:
-            print("")
-    except Exception as ex: # pylint: disable=W0718
-        later(ex)
-    if "-v" in sys.argv:
-        errors()
-
-
 def main():
     "main"
-    Cfg.user = getpass.getuser()
-    if "-d" in sys.argv:
-        daemon("-v" in sys.argv)
-        pidfile(Cfg.pidfile)
-    privileges(Cfg.user)
-    scan(modules, Cfg.mod)
-    path = os.path.join(os.path.dirname(objd.__file__), "feeds.opml")
-    if os.path.exists(path):
-        txt = f"opm {path}"
-        cmnd(txt, dontprint)
-    init(modules, Cfg.mod)
-    while 1:
-        time.sleep(1.0)
+    parse(Cfg, " ".join(sys.argv[1:]))
+    Cfg.mod = ",".join(dir(modules))
+    daemon("v" in Cfg.opts)
+    scan(modules, Cfg.mod, Cfg.sets.dis)
+    init(modules, Cfg.mod, Cfg.sets.dis)
+    pidfile(Cfg.pidfile)
+    forever()
 
 
 if __name__ == "__main__":
-    wrap(main)
+    main()

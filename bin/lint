@@ -1,1 +1,1 @@
-pylint objx objr objd bin/objd  bin/tinder
+pylint objx objr objd bin/objd  bin/objctl bin/objsh bin/tinder

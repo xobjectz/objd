@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "objd"
 description = "object daemon"
-version = "12"
+version = "13"
 authors = [
     {name = "Bart Thate",email = "bthate@dds.nl"},
 ]
@@ -26,6 +26,9 @@ classifiers = [
     'Topic :: Utilities'
 ]
 
+[project.scripts]
+"objd" = "objd:main:__main__"
+
 [project.urls]
 "home" = "https://pypi.org/project/objd"
 "bugs" = "https://github.com/xobjectz/objd/issues"
@@ -35,6 +38,7 @@ classifiers = [
 script-files = [
     'bin/objctl',
     'bin/objd',
+    'bin/objsh'
 ]
 packages = [
     'objd',
