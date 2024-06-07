@@ -302,11 +302,11 @@ def rem(event):
     if len(event.args) != 1:
         event.reply('rem <stringinurl>')
         return
-    selector = {'rss': event.args[0]}
-    for fnm, feed in broker.find(selector, match="rss"):
+    for _fnm, feed in broker.all("rss"):
+        if event.args[0] not in feed.rss:
+            continue
         if feed:
             feed.__deleted__ = True
-            broker.add(feed, fnm)
     event.reply('ok')
 
 
@@ -315,8 +315,9 @@ def res(event):
     if len(event.args) != 1:
         event.reply('res <stringinurl>')
         return
-    selector = {'rss': event.args[0]}
-    for fnm, feed in broker.find(selector, match="rss", deleted=True):
+    for fnm, feed in broker.all("rss", True):
+        if event.args[0] not in feed.rss:
+            continue
         if feed:
             feed.__deleted__ = False
             broker.add(feed, fnm)

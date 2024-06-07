@@ -71,7 +71,7 @@ param.dpl = ["hnrss title,summary,link"]
 param.mre = ["2"]
 param.nme = ["hnrss hackernews"]
 param.pwd = ["bart bla"]
-#param.rem = ["hnrss"]
+param.rem = ["hnrss"]
 param.rss = ["http://hnrss.org/newest"]
 param.ver = [""]
 

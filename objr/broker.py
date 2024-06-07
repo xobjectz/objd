@@ -37,11 +37,14 @@ class Broker:
             if name not in Broker.fqns:
                 Broker.fqns.append(name)
 
-    def all(self, name=None):
+    def all(self, name=None, deleted=False):
         "return all objects."
         with lock:
+            name = self.long(name)
             for key, obj in items(self.objs):
                 if name and name not in key:
+                    continue
+                if deleted and '__deleted__' in dir(obj):
                     continue
                 yield key, obj
 
@@ -54,7 +57,7 @@ class Broker:
             for key, obj in items(self.objs):
                 if not deleted and '__deleted__' in dir(obj):
                     continue
-                if match and match not in key:
+                if match and self.long(match) not in key:
                     continue
                 if selector and not search(obj, selector):
                     continue
