@@ -8,6 +8,7 @@ import _thread
 
 
 from objx import Object, fqn, ident, items, keys, search
+from objx import match as domatch
 
 
 from .utils import fntime
@@ -59,9 +60,10 @@ class Broker:
             for key, obj in items(self.objs):
                 if deleted and '__deleted__' not in dir(obj):
                     continue
-                if match and not obj.match(match):
+                print(type(obj), obj)
+                if match and not domatch(match):
                     continue
-                if selector and not match(obj, selector):
+                if selector and not obj.match(obj, selector):
                     continue
                 nrss += 1
                 if index is not None and nrss != int(index):
