@@ -6,8 +6,8 @@
 
 from .command import command
 from .command import scan as scancmd
+from .errors  import later
 from .handler import Event, Handler
-from .thread  import later
 from .utils   import skip, spl
 
 
@@ -18,7 +18,7 @@ class Client(Handler):
     def __init__(self):
         Handler.__init__(self)
         self.register("command", command)
-        
+
     def announce(self, txt):
         "announce text."
         self.raw(txt)

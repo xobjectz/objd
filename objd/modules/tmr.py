@@ -14,8 +14,10 @@ from objx import update
 
 from objr.handler import Event
 from objr.run     import broker
-from objr.thread  import Timer, launch
+from objr.thread  import launch
+from objr.timer   import Timer
 from objr.utils   import laps
+
 
 def init():
     "initialaze modules."

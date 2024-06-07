@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+ #!/usr/bin/env python3
 # This file is placed in the Public Domain.
 #
 # pylint: disable=C,R,W0105,E0401
@@ -24,10 +24,11 @@ from objx import Default, Object, keys
 
 from objr.client  import Client, scan
 from objr.command import Command
+from objr.errors  import errors
 from objr.handler import Event
 from objr.log     import debug, enable
 from objr.parse   import parse
-from objr.thread  import errors, launch
+from objr.thread  import launch
 from objr.utils   import laps
 
 

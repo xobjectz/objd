@@ -10,8 +10,8 @@ import inspect
 from objx import Object
 
 
+from .errors  import later
 from .parse   import parse
-from .thread  import later
 
 
 class Command(Object): # pylint: disable=R0903

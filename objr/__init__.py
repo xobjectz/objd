@@ -7,10 +7,11 @@
 from .broker  import Broker
 from .client  import Client, cmnd, scan
 from .command import Command
+from .errors  import errors, later
 from .handler import Event, Handler
 from .log     import debug, enable
 from .parse   import parse
-from .thread  import launch, name
+from .thread  import launch
 from .utils   import *
 
 

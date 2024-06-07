@@ -21,7 +21,8 @@ from objx import Default, Object, fmt, update, values
 
 
 from objr.run    import broker
-from objr.thread import Repeater, launch
+from objr.thread import launch
+from objr.timer  import Repeater
 from objr.utils  import fntime, laps, spl
 
 

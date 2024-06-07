@@ -4,7 +4,7 @@
 "deferred exception handling"
 
 
-from objr.thread import Errors, formatexc
+from objr.errors import Errors, formatexc
 
 
 def err(event):

@@ -5,9 +5,17 @@
 
 
 import os
+import pathlib
 import time
+import types
 import uuid
 import _thread
+
+
+def cdir(pth):
+    "create directory."
+    path = pathlib.Path(pth)
+    path.parent.mkdir(parents=True, exist_ok=True)
 
 
 def fntime(daystr):
@@ -73,15 +81,39 @@ def laps(seconds, short=True):
     return txt
 
 
+def name(obj):
+    "return a full qualified name of an object/function/module."
+    # pylint: disable=R0911
+    typ = type(obj)
+    if isinstance(typ, types.ModuleType):
+        return obj.__name__
+    if '__builtins__' in dir(typ):
+        return obj.__name__
+    if '__self__' in dir(obj):
+        return f'{obj.__self__.__class__.__name__}.{obj.__name__}'
+    if '__class__' in dir(obj) and '__name__' in dir(obj):
+        return f'{obj.__class__.__name__}.{obj.__name__}'
+    if '__class__' in dir(obj):
+        return f"{obj.__class__.__module__}.{obj.__class__.__name__}"
+    if '__name__' in dir(obj):
+        return f'{obj.__class__.__name__}.{obj.__name__}'
+    return None
+
+
+def pjoin(*args):
+    "path join."
+    return "/".join(args)
+
+
 def shortid():
     "create short id."
     return str(uuid.uuid4())[:8]
 
 
-def skip(name, skipp):
+def skip(nme, skipp):
     "check for skipping"
     for skp in spl(skipp):
-        if skp in name:
+        if skp in nme:
             return True
     return False
 
@@ -106,6 +138,8 @@ def __dir__():
         'fntime',
         'forever',
         'laps',
+        'name',
+        'pjoin',
         'shortid',
         'skip',
         'spl',

@@ -126,21 +126,12 @@ def keys(obj):
     return list(obj.__dict__.keys())
 
 
-def match(obj, selector):
+def match(obj, txt):
     "check if object matches provided values."
-    res = False
-    if not selector:
-        return res
-    for key, value in items(selector):
-        val = getattr(obj, key, None)
-        if not val:
-            break
-        if str(value) == str(val):
-            res = True
-        else:
-            res = False
-            break
-    return res
+    for key in keys(obj):
+        if txt in key:
+            return True
+    return False
 
 
 def read(obj, pth):

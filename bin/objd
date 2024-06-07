@@ -14,9 +14,9 @@ from objx import Default, cdir
 
 
 from objr.client  import cmnd, init, scan
+from objr.errors  import setout
 from objr.log     import enable
 from objr.parse   import parse
-from objr.thread  import setout
 from objr.utils   import forever
 
 

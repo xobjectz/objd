@@ -46,11 +46,11 @@ from objx import Default
 
 from objr.client  import Client, cmnd, init, scan
 from objr.command import Command
+from objr.errors  import errors, later, setout
 from objr.handler import Event
 from objr.log     import debug, enable
 from objr.parse   import parse
 from objr.run     import broker
-from objr.thread  import errors, later, setout
 from objr.utils   import forever
 
 

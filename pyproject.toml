@@ -26,9 +26,6 @@ classifiers = [
     'Topic :: Utilities'
 ]
 
-[project.scripts]
-"objd" = "objd:main:__main__"
-
 [project.urls]
 "home" = "https://pypi.org/project/objd"
 "bugs" = "https://github.com/xobjectz/objd/issues"

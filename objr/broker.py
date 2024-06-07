@@ -60,15 +60,23 @@ class Broker:
             for key, obj in items(self.objs):
                 if deleted and '__deleted__' not in dir(obj):
                     continue
-                print(type(obj), obj)
-                if match and not domatch(match):
+                if match and not domatch(obj, match):
                     continue
-                if selector and not obj.match(obj, selector):
+                if selector and not search(obj, selector):
                     continue
                 nrss += 1
                 if index is not None and nrss != int(index):
                     continue
                 yield (key, obj)
+
+    def first(self):
+        "return first object."
+        for key in keys(self.objs):
+            return getattr(self.objs, key)
+
+    def get(self, orig):
+        "return object by origin (repr)"
+        return getattr(self.objs, orig, None)
 
     def last(self, obj, selector=None):
         "return last object saved."
@@ -89,15 +97,6 @@ class Broker:
             if txt.lower() in qual.split(".")[-1].lower():
                 return qual
         return txt
-
-    def first(self):
-        "return first object."
-        for key in keys(self.objs):
-            return getattr(self.objs, key)
-
-    def get(self, orig):
-        "return object by origin (repr)"
-        return getattr(self.objs, orig, None)
 
     def remove(self, obj):
         "remove object from broker"
