@@ -1,0 +1,7 @@
+grep -R sys objx objr objd
+grep -R "print(" objx objr objd
+grep -R __import__ objx objr objd
+grep -R importlib objx objr objd
+grep -R "import sys" objx objr objd
+#grep -R "import os" objx objr objd
+
