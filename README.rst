@@ -53,7 +53,6 @@ USAGE
     use the objctl program to manage objd
 
 
-
 CONFIGURATION
 
 ::

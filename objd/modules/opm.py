@@ -124,15 +124,17 @@ def imp(event):
     prs = Parser()
     nrs = 0
     insertid = shortid()
+    print(list(broker.all()))
     for obj in prs.parse(txt, 'outline', "name,display_list,xmlUrl"):
-        nrs += 1
-        if obj.xmlUrl and broker.find({"rss": obj.xmlUrl}, match="rss"):
+        if obj.xmlUrl and broker.find({"rss": obj.xmlUrl}):
             event.reply(f"skipping {obj.xmlUrl}")
             continue
         rss = Rss()
         construct(rss, obj)
         rss.rss = rss.xmlUrl
         rss.insertid = insertid
+        broker.add(rss)
+        nrs += 1
     if nrs:
         event.reply(f"added {nrs} urls.")
         

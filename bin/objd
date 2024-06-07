@@ -13,7 +13,8 @@ import sys
 from objx import Default, cdir
 
 
-from objr.client  import init, scan
+from objr.client  import cmnd, init, scan
+from objr.log     import enable
 from objr.parse   import parse
 from objr.thread  import setout
 from objr.utils   import forever
@@ -25,7 +26,7 @@ from objd import modules
 Cfg             = Default()
 Cfg.dis         = ""
 Cfg.opts        = ""
-Cfg.mod         = "cmd,err,mod,thr,irc,rss"
+Cfg.mod         = "cmd,err,irc,opm,rss,thr"
 Cfg.name        = __file__.rsplit(os.sep, maxsplit=1)[-1]
 Cfg.version     = "13"
 Cfg.wdr         = os.path.expanduser(f"~/.{Cfg.name}")
@@ -72,11 +73,15 @@ def privileges(username):
 
 def main():
     "main"
-    setout(print)
     parse(Cfg, " ".join(sys.argv[1:]))
+    if "v" in Cfg.opts:
+        enable(print)
+        setout(print)
+    scan(modules, Cfg.mod, Cfg.sets.dis)
+    cmnd(Cfg.otxt, print)
+    print(Cfg.otxt)
     daemon("v" in Cfg.opts)
     pidfile(Cfg.pidfile)
-    scan(modules, Cfg.mod, Cfg.sets.dis)
     init(modules, Cfg.mod, Cfg.sets.dis)
     forever()
 

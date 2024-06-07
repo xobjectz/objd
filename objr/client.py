@@ -18,7 +18,7 @@ class Client(Handler):
     def __init__(self):
         Handler.__init__(self)
         self.register("command", command)
-
+        
     def announce(self, txt):
         "announce text."
         self.raw(txt)
@@ -36,10 +36,11 @@ class Client(Handler):
             self.say(evt.channel, txt)
 
 
-def cmnd(txt, outer):
+def cmnd(txt, outer=None):
     "do a command using the provided output function."
     clt = Client()
-    clt.raw = outer
+    if outer:
+        clt.raw = outer
     evn = Event()
     evn.orig = object.__repr__(clt)
     evn.txt = txt

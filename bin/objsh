@@ -129,6 +129,7 @@ def main():
         dte = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
         debug(f'{dte} {Cfg.name.upper()} {Cfg.opts.upper()} {Cfg.mod.upper()}'.replace("  ", " "))
     scan(modules, Cfg.mod, Cfg.sets.dis)
+    cmnd(Cfg.otxt, print)
     init(modules, Cfg.mod, Cfg.sets.dis)
     csl = Console()
     csl.start()

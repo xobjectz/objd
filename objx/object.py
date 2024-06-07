@@ -126,6 +126,23 @@ def keys(obj):
     return list(obj.__dict__.keys())
 
 
+def match(obj, selector):
+    "check if object matches provided values."
+    res = False
+    if not selector:
+        return res
+    for key, value in items(selector):
+        val = getattr(obj, key, None)
+        if not val:
+            break
+        if str(value) == str(val):
+            res = True
+        else:
+            res = False
+            break
+    return res
+
+
 def read(obj, pth):
     "read an object from file path."
     with lock:
@@ -137,9 +154,11 @@ def search(obj, selector):
     "check if object matches provided values."
     res = False
     if not selector:
-        return True
+        return res
     for key, value in items(selector):
         val = getattr(obj, key, None)
+        if not val:
+            continue
         if str(value).lower() in str(val).lower():
             res = True
         else:

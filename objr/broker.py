@@ -51,15 +51,17 @@ class Broker:
     def find(self, selector=None, index=None, deleted=False, match=None):
         "find objects stored in the broker."
         with lock:
+            if match:
+                match = self.long(match)
             if selector is None:
                 selector = {}
             nrss = 0
             for key, obj in items(self.objs):
-                if not deleted and '__deleted__' in dir(obj):
+                if deleted and '__deleted__' not in dir(obj):
                     continue
-                if match and self.long(match) not in key:
+                if match and not obj.match(match):
                     continue
-                if selector and not search(obj, selector):
+                if selector and not match(obj, selector):
                     continue
                 nrss += 1
                 if index is not None and nrss != int(index):
@@ -79,8 +81,10 @@ class Broker:
 
     def long(self, txt):
         "expand to full qualified name."
+        if not txt:
+            return txt
         for qual in Broker.fqns:
-            if txt in qual.split(".")[-1].lower():
+            if txt.lower() in qual.split(".")[-1].lower():
                 return qual
         return txt
 
