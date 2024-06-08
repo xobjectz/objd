@@ -71,6 +71,7 @@ class Fetcher(Object):
         self.dosave = False
         self.seen = Seen()
         self.seenfn = None
+        broker.add(self)
 
     @staticmethod
     def display(obj):
@@ -94,7 +95,7 @@ class Fetcher(Object):
             result += ' - '
         return result[:-2].rstrip()
 
-    def fetch(self, feed):
+    def fetch(self, feed, silent=False):
         "fetch feed."
         with fetchlock:
             counter = 0
@@ -115,6 +116,8 @@ class Fetcher(Object):
                 if self.dosave:
                     broker.add(fed)
                 result.append(fed)
+        if silent:
+            return counter
         #if result:
         #    broker.add(self.seen, self.seenfn)
         txt = ''
@@ -128,11 +131,11 @@ class Fetcher(Object):
                     bot.announce(txt2.rstrip())
         return counter
 
-    def run(self):
+    def run(self, silent=False):
         "fetch all feeds."
         thrs = []
         for _fn, feed in broker.all('rss'):
-            thrs.append(launch(self.fetch, feed, name=f"{feed.rss}"))
+            thrs.append(launch(self.fetch, feed, silent, name=f"{feed.rss}"))
         return thrs
 
     def start(self, repeat=True):
@@ -349,3 +352,19 @@ def rss(event):
     feed.rss = event.args[0]
     broker.add(feed)
     event.reply('ok')
+
+
+def syn(event):
+    "synchronize feeds."
+    fetchers = list(broker.all("fetcher"))
+    if not fetchers:
+        event.reply("no fetcher found.")
+        return
+    fetcher = fetchers[0][-1]
+    thrs = fetcher.run(True)
+    nrs = 0
+    for thr in thrs:
+        thr.join()
+        nrs += 1
+    event.reply(f"{nrs} feeds synced")
+ 

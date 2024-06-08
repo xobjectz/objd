@@ -7,7 +7,7 @@
 import _thread
 
 
-from objx import Object, fqn, ident, items, keys, search
+from objx import Object, fqn, ident, items, keys, search, update
 from objx import match as domatch
 
 
@@ -87,6 +87,7 @@ class Broker:
         if result:
             inp = result[-1]
             res = inp[0]
+            update(obj, res)
         return res
 
     def long(self, txt):
