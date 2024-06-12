@@ -14,10 +14,6 @@ authors = [
 ]
 readme = "README.rst"
 license = {text="Public Domain"}
-dependencies = [
-    'objx',
-    'objr'
-]
 classifiers = [ 
     'Development Status :: 3 - Alpha',
     'License :: Public Domain',
@@ -33,9 +29,8 @@ classifiers = [
 
 [tool.setuptools]
 script-files = [
-    'bin/objctl',
-    'bin/objd',
-    'bin/objsh'
+    'bin/objdctl',
+    'bin/objd'
 ]
 packages = [
     'objd',
