@@ -9,24 +9,24 @@ import re
 import time as ttime
 
 
-from objx import update
-
-
-from objr.handler import Event
-from objr.run     import broker
-from objr.thread  import launch
-from objr.timer   import Timer
-from objr.utils   import laps
+from ..disk   import sync
+from ..event  import Event
+from ..find   import find
+from ..object import update
+from ..run    import broker
+from ..thread import launch
+from ..timer  import Timer
+from ..utils  import laps
 
 
 def init():
-    "initialaze modules."
-    for _fnm, obj in broker.all("timer"):
+    "start timers."
+    for _fn, obj in find("timer"):
         if "time" not in obj:
             continue
         diff = float(obj.time) - ttime.time()
         if diff > 0:
-            bot = broker.first()
+            bot = broker.first("irc")
             evt = Event()
             update(evt, obj)
             evt.orig = object.__repr__(bot)
@@ -61,7 +61,7 @@ FORMATS = [
 
 class NoDate(Exception):
 
-    "can't parse date."
+    "NoDate"
 
 
 def extract_date(daystr):
@@ -72,7 +72,7 @@ def extract_date(daystr):
             res = ttime.mktime(ttime.strptime(daystr, fmt))
             break
         except ValueError:
-            pass
+            res = None
     return res
 
 
@@ -91,7 +91,7 @@ def get_day(daystr):
             if ymre:
                 (day, month) = ymre.groups()
                 yea = ttime.strftime("%Y", ttime.localtime())
-        except Exception as ex:
+        except Exception as ex: # pylint: disable=W0212
             raise NoDate(daystr) from ex
     if day:
         day = int(day)
@@ -103,7 +103,7 @@ def get_day(daystr):
 
 
 def get_hour(daystr):
-    "get hour from string."
+    "return hour from string."
     try:
         hmsre = re.search(r'(\d+):(\d+):(\d+)', str(daystr))
         hours = 60 * 60 * (int(hmsre.group(1)))
@@ -125,7 +125,7 @@ def get_hour(daystr):
 
 
 def get_time(txt):
-    "return time from string."
+    "parse full time string."
     try:
         target = get_day(txt)
     except NoDate:
@@ -160,7 +160,7 @@ def parse_time(txt):
 
 
 def to_day(daystr):
-    "scan string for day/time."
+    "parse day from string."
     previous = ""
     line = ""
     daystr = str(daystr)
@@ -170,34 +170,29 @@ def to_day(daystr):
         previous = word
         try:
             res = extract_date(line.strip())
+            break
         except ValueError:
             res = None
-        if res:
-            break
         line = ""
     return res
 
+
 def today():
-    "return time of today."
+    "return date."
     return str(datetime.datetime.today()).split()[0]
 
 
 def tmr(event):
-    "set timer."
-    # pylint: disable=R0912
-    res = None
+    "add a timer."
+    result = ""
     if not event.rest:
         nmr = 0
-        for _fnm, obj in broker.all('timer'):
-            if "time" not in obj:
-                continue
+        for _fn, obj in find('timer'):
             lap = float(obj.time) - ttime.time()
             if lap > 0:
                 event.reply(f'{nmr} {obj.txt} {laps(lap)}')
                 nmr += 1
-        if not nmr:
-            event.reply("no timers")
-        return res
+        return result
     seconds = 0
     line = ""
     for word in event.args:
@@ -206,7 +201,7 @@ def tmr(event):
                 seconds = int(word[1:])
             except (ValueError, IndexError):
                 event.reply(f"{seconds} is not an integer")
-                return res
+                return result
         else:
             line += word + " "
     if seconds:
@@ -221,7 +216,7 @@ def tmr(event):
             target += hour
     if not target or ttime.time() > target:
         event.reply("already passed given time.")
-        return res
+        return result
     event.time = target
     diff = target - ttime.time()
     event.reply("ok " +  laps(diff))
@@ -229,6 +224,6 @@ def tmr(event):
     event.result.append(event.rest)
     timer = Timer(diff, event.show, thrname=event.cmd)
     update(timer, event)
-    broker.add(timer)
+    sync(timer)
     launch(timer.start)
-    return res
+    return result

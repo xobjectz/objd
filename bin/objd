@@ -5,19 +5,17 @@
 "daemon"
 
 
+import getpass
 import os
+import pathlib
 import pwd
 import sys
+import time
 
 
-from objx import Default, cdir
-
-
-from objr.client  import cmnd, init, scan
-from objr.errors  import setout
-from objr.log     import enable
-from objr.parse   import parse
-from objr.utils   import forever
+from objd.client  import init, scan
+from objd.default import Default
+from objd.disk    import Workdir
 
 
 from objd import modules
@@ -25,25 +23,26 @@ from objd import modules
 
 Cfg             = Default()
 Cfg.dis         = ""
+Cfg.mod         = "cmd,err,irc,log,mod,req,rss,tdo,thr,tmr"
 Cfg.opts        = ""
-Cfg.mod         = "cmd,err,irc,opm,rss,thr"
-Cfg.name        = __file__.rsplit(os.sep, maxsplit=1)[-1]
+Cfg.name        = "objd"
 Cfg.version     = "13"
 Cfg.wdr         = os.path.expanduser(f"~/.{Cfg.name}")
 Cfg.pidfile     = os.path.join(Cfg.wdr, f"{Cfg.name}.pid")
-Cfg.mdir        = os.path.join(Cfg.wdr, "mods")
 
 
-def daemon(verbose=False):
+Workdir.workdir = Cfg.wdr
+
+
+def daemon(pidfile, verbose=False):
     "switch to background."
-    # pylint: disable=W0212
     pid = os.fork()
     if pid != 0:
-        os._exit(0)
+        os._exit(0) # pylint: disable=W0212
     os.setsid()
     pid2 = os.fork()
     if pid2 != 0:
-        os._exit(0)
+        os._exit(0) # pylint: disable=W0212
     if not verbose:
         with open('/dev/null', 'r', encoding="utf-8") as sis:
             os.dup2(sis.fileno(), sys.stdin.fileno())
@@ -53,14 +52,11 @@ def daemon(verbose=False):
             os.dup2(ses.fileno(), sys.stderr.fileno())
     os.umask(0)
     os.chdir("/")
-
-
-def pidfile(path):
-    "create pidfile"
-    if os.path.exists(path):
-        os.unlink(path)
-    cdir(path)
-    with open(path, "w", encoding="utf-8") as fds:
+    if os.path.exists(pidfile):
+        os.unlink(pidfile)
+    path = pathlib.Path(pidfile)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(pidfile, "w", encoding="utf-8") as fds:
         fds.write(str(os.getpid()))
 
 
@@ -73,18 +69,15 @@ def privileges(username):
 
 def main():
     "main"
-    parse(Cfg, " ".join(sys.argv[1:]))
-    if "v" in Cfg.opts:
-        enable(print)
-        setout(print)
-    scan(modules, Cfg.mod, Cfg.sets.dis)
-    cmnd(Cfg.otxt, print)
-    print(Cfg.otxt)
-    daemon("v" in Cfg.opts)
-    pidfile(Cfg.pidfile)
-    init(modules, Cfg.mod, Cfg.sets.dis)
-    forever()
+    Workdir.skel()
+    Cfg.user = getpass.getuser()
+    Cfg.mod  = ",".join(dir(modules))
+    daemon(Cfg.pidfile, "-v" in sys.argv)
+    privileges(Cfg.user)
+    scan(modules, Cfg.mod)
+    init(modules, Cfg.mod)
+    while 1:
+        time.sleep(1.0)
 
 
-if __name__ == "__main__":
-    main()
+main()

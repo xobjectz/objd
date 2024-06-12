@@ -13,7 +13,7 @@ SYNOPSIS
 
 ::
 
-    objctl <cmd> [key=val] [key==val]
+    objdctl <cmd> [key=val] [key==val]
     objd
 
 
@@ -59,33 +59,33 @@ CONFIGURATION
 
     the cfg command is used for configuration of the IRC bot
 
-    $ objctl cfg 
+    $ objdctl cfg 
     channel=#objd commands=True nick=objd port=6667 server=localhost
 
     irc
 
-    $ objctl cfg server=<server>
-    $ objctl cfg channel=<channel>
-    $ objctl cfg nick=<nick>
+    $ objdctl cfg server=<server>
+    $ objdctl cfg channel=<channel>
+    $ objdctl cfg nick=<nick>
 
     sasl
 
-    $ objctl pwd <nsvnick> <nspass>
-    $ objctl cfg password=<frompwd>
+    $ objdctl pwd <nsvnick> <nspass>
+    $ objdctl cfg password=<frompwd>
 
     rss
 
-    $ objctl rss <url>
-    $ objctl dpl <url> <item1,item2>
-    $ objctl rem <url>
-    $ objctl nme <url> <name>
+    $ objdctl rss <url>
+    $ objdctl dpl <url> <item1,item2>
+    $ objdctl rem <url>
+    $ objdctl nme <url> <name>
 
 
 COMMANDS
 
 ::
 
-    $ objctl cmd
+    $ objdctl cmd
     cfg,cmd,dne,dpl,err,flt,log,mod,mre,nme,pwd,rem,req,res,rss,tdo,thr,tmr
 
 
@@ -113,7 +113,7 @@ SYSTEMD
 ::
 
     [Unit]
-    Description=object daemon
+    Description=objects daemon
     Requires=network-online.target
     After=network-online.target
 
@@ -144,7 +144,7 @@ FILES
 ::
 
     ~/.objd
-    ~/.local/bin/objctl
+    ~/.local/bin/objdctl
     ~/.local/bin/objd
     ~/.local/pipx/venvs/objd/
 

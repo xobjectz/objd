@@ -15,16 +15,16 @@ import time
 import _thread
 
 
-from objx  import Default, Object, edit, fmt, keys, values
-
-
-from objr.client  import Client
-from objr.command import command
-from objr.errors  import later
-from objr.handler import Event
-from objr.log     import Logging, debug
-from objr.run     import broker
-from objr.thread  import launch
+from ..client  import Client, command
+from ..classes import Classes
+from ..default import Default
+from ..disk    import sync
+from ..event   import Event
+from ..find    import last
+from ..log     import Logging, debug
+from ..object  import Object, edit, fmt, keys, values
+from ..run     import broker
+from ..thread  import later, launch
 
 
 NAME    = __file__.split(os.sep)[-3]
@@ -83,6 +83,8 @@ class Config(Default): # pylint: disable=R0902,R0903
         self.server = self.server or Config.server
         self.username = self.username or Config.username
 
+
+Classes.whitelist(Config)
 
 
 class TextWrap(textwrap.TextWrapper):
@@ -507,7 +509,7 @@ class IRC(Client, Output):
 
     def start(self):
         "start bot."
-        broker.last(self.cfg)
+        last(self.cfg)
         if self.cfg.channel not in self.channels:
             self.channels.append(self.cfg.channel)
         self.events.connected.clear()
@@ -622,7 +624,7 @@ def cb_quit(bot, evt):
 def cfg(event):
     "configure command."
     config = Config()
-    broker.last(config)
+    path = last(config)
     if not event.sets:
         event.reply(
                     fmt(
@@ -633,7 +635,7 @@ def cfg(event):
                    )
     else:
         edit(config, event.sets)
-        broker.add(config)
+        sync(config, path)
         event.reply('ok')
 
 

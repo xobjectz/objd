@@ -4,11 +4,10 @@
 "outline processor markup language"
 
 
-from objx import Default, construct, items, update
-from objr import shortid, spl
-
-
-from objr.run import broker
+from ..default import Default
+from ..object  import construct, update
+from ..run     import broker
+from ..utils   import shortid, spl
 
 
 from .rss import Rss
@@ -101,7 +100,7 @@ def exp(event):
     "export to opml."
     event.reply(TEMPLATE)
     nrs = 0
-    for _fn, objr in items(broker.objs):
+    for _fn, objr in broker.all("rss"):
         nrs += 1
         obj = Default()
         update(obj, objr)

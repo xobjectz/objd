@@ -7,11 +7,10 @@
 import time
 
 
-from objx import Object
-from objr import fntime, laps
-
-
-from objr.run import broker
+from ..disk   import sync
+from ..find   import find, fntime
+from ..object import Object
+from ..utils  import laps
 
 
 class Log(Object): # pylint: disable=R0903
@@ -27,7 +26,7 @@ def log(event):
     "log text."
     if not event.rest:
         nmr = 0
-        for fnm, obj in broker.all('log'):
+        for fnm, obj in find('log'):
             lap = laps(time.time() - fntime(fnm))
             event.reply(f'{nmr} {obj.txt} {lap}')
             nmr += 1
@@ -36,5 +35,5 @@ def log(event):
         return
     obj = Log()
     obj.txt = event.rest
-    broker.add(obj)
+    sync(obj)
     event.reply('ok')
