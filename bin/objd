@@ -13,6 +13,9 @@ import sys
 import time
 
 
+sys.path.insert(0, os.getcwd()) # pylint: disable=R0903
+
+
 from objd.client  import init, scan
 from objd.default import Default
 from objd.disk    import Workdir
