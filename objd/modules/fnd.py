@@ -4,10 +4,8 @@
 "locate"
 
 
-from objx import fmt
-
-
-from objr.run import broker
+from objd.iface import fmt
+from objd.run   import broker
 
 
 def fnd(event):
@@ -18,7 +16,7 @@ def fnd(event):
     otype = event.args[0]
     clz = broker.long(otype)
     nmr = 0
-    for _fnm, obj in broker.find(event.gets, match=clz):
+    for _fnm, obj in broker.find(clz, event.gets):
         event.reply(f"{nmr} {fmt(obj)}")
         nmr += 1
     if not nmr:

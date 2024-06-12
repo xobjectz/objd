@@ -68,7 +68,7 @@ objrdir = [
         'laps',
         'later',
         'launch',
-        'name',
+        'named',
         'scan',
         'spl'
     ]

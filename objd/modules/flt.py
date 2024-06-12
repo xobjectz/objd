@@ -4,8 +4,8 @@
 "fleet"
 
 
-from objr     import Handler, name
-from objr.run import broker
+from objd.iface import Handler, named
+from objd.run   import broker
 
 
 def flt(event):
@@ -18,4 +18,4 @@ def flt(event):
     try:
         event.reply(bots[int(event.args[0])])
     except (IndexError, ValueError):
-        event.reply(",".join([name(x).split(".")[-1] for x in bots]))
+        event.reply(",".join([named(x).split(".")[-1] for x in bots]))
