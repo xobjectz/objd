@@ -179,6 +179,7 @@ if __name__ == "__main__":
         Cfg.mod += ",".join(dir(MODULES))
     if MODS:
         Cfg.mod += "," + ",".join(dir(MODS))
+    Workdir.skel()
     Errors.out = Logging.out = print
     dte = " ".join(time.ctime(time.time()).replace("  ", " ").split()[1:])
     debug(f'{dte} {Cfg.name.upper()} {Cfg.opts.upper()} {Cfg.mod.upper()}'.replace("  ", " "))
