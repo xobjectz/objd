@@ -4,11 +4,11 @@
 # pylint: disable=C0413,W0212,W0611
 
 
-"""OTPCR 
+"""OBJD
 
-    otpcr  <cmd> [key=val] [key==val]
-    otpcr  [-a] [-c] [-h] [-v]
-    otpcrd
+    objctl  <cmd> [key=val] [key==val]
+    objctl  [-a] [-c] [-h] [-v]
+    objd
 
     options are:
 
@@ -19,7 +19,7 @@
 
     the cmd command show available commands.
     
-    $ otpcr cmd
+    $ objctl cmd
     cfg,cmd,dpl,err,exp,imp,mod,mre,nme,pwd,rem,res,rss,thr
 
 """
@@ -35,16 +35,9 @@ import termios
 import time
 
 
-from objd.client  import Client, cmnd, init, scan
-from objd.default import Default
-from objd.disk    import Workdir
-from objd.errors  import Errors, errors
-from objd.event   import Event
-from objd.log     import Logging, debug
-from objd.parser  import parse
-from objd.run     import broker
-
-
+from objx import Default
+from objr import Client, Errors, Event, Logging, Workdir
+from objr import broker, cmnd, init, scan, errors, debug, parse
 from objd import modules
 
 

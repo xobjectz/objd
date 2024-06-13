@@ -1,1 +1,1 @@
-pylint objd bin/objd  bin/objdctl bin/tinder tests
+pylint objx objr objd bin/objd  bin/objdctl bin/tinder tests

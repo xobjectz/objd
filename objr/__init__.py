@@ -5,7 +5,7 @@
 
 
 from .classes  import Classes
-from .client   import Client, cmnd, scan
+from .client   import Client, cmnd, init, scan
 from .commands import Commands, command
 from .disk     import Workdir, fetch, sync
 from .errors   import Errors, errors, later
