@@ -153,6 +153,7 @@ def wrap(func):
 def main():
     "main"
     scan(modules, Cfg.mod)
+    scan(mods, Cfg.mod)
     nrs = Cfg.index or 1
     nrcommand = len(Commands.cmds) or 1
     thrs = []
