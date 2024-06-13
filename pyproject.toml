@@ -13,6 +13,10 @@ authors = [
     {name = "Bart Thate",email = "bthate@dds.nl"},
 ]
 readme = "README.rst"
+dependencies = [
+    "objx",
+    "objr"
+]
 license = {text="Public Domain"}
 classifiers = [ 
     'Development Status :: 3 - Alpha',
