@@ -20,9 +20,14 @@ sys.path.insert(0, os.getcwd())
 
 
 from objx import Default, Object, keys
-from objr import Client, Commands, Errors, Event
+from objr import Client, Commands, Errors, Event, Workdir
 from objr import debug, errors, laps, launch, parse, scan
-from objd import modules
+
+
+try:
+    from objd import modules
+except ModuleNotFoundError:
+    modules = None
 
 
 if os.path.exists("mods"):
@@ -49,6 +54,9 @@ Cfg.silent  = False
 Cfg.skip    = ["debug",]
 Cfg.version = "19"
 Cfg.wdr     = ".test"
+
+
+Workdir.workdir = Cfg.wdr
 
 
 events = []
@@ -164,9 +172,10 @@ def main():
 if __name__ == "__main__":
     parse(Cfg, " ".join(sys.argv[1:]))
     if "f" in Cfg.opts:
-        if os.path.exists(workdir):
-            shutil.rmtree(workdir)
-    Cfg.mod = ",".join(dir(modules))
+        if os.path.exists(Workdir,workdir):
+            shutil.rmtree(Workdir.workdir)
+    if modules:
+        Cfg.mod += ",".join(dir(modules))
     if mods:
         Cfg.mod += "," + ",".join(dir(mods))
     Errors.out = print
