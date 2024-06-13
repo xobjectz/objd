@@ -17,14 +17,9 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus, urlencode
 
 
-from ..default  import Default
-from ..disk     import sync
-from ..find     import last
-from ..object   import Object, fmt, update, values
-from ..repeater import Repeater
-from ..run      import broker
-from ..thread   import launch
-from ..utils    import fntime, laps, spl
+from objx import Default, Object, fmt, update, values
+from objr import Classes, Repeater
+from objr import broker, fntime, last, laps, launch, spl, sync
 
 
 def init():
@@ -55,7 +50,7 @@ class Rss(Default): # pylint: disable=R0903
         self.rss          = ''
 
 
-broker.register(Rss)
+Classes.whitelist(Rss)
 
 
 class Seen(Default): # pylint: disable=R0903
@@ -67,6 +62,9 @@ class Seen(Default): # pylint: disable=R0903
         self.urls = []
 
 
+Classes.whitelist(Seen)
+
+
 class Fetcher(Object):
 
     "Fetcher"
@@ -75,7 +73,6 @@ class Fetcher(Object):
         self.dosave = False
         self.seen = Seen()
         self.seenfn = None
-        broker.add(self)
 
     @staticmethod
     def display(obj):

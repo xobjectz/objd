@@ -4,7 +4,7 @@
 "deferred exception handling"
 
 
-from ..errors import Errors
+from objr.errors import Errors
 
 
 def err(event):

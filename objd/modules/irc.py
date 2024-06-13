@@ -15,16 +15,9 @@ import time
 import _thread
 
 
-from ..client  import Client, command
-from ..classes import Classes
-from ..default import Default
-from ..disk    import sync
-from ..event   import Event
-from ..find    import last
-from ..log     import Logging, debug
-from ..object  import Object, edit, fmt, keys, values
-from ..run     import broker
-from ..thread  import later, launch
+from objx import Default, Object, edit, fmt, keys, values
+from objr import Classes, Client, Event, Logging
+from objr import broker, command, debug, later, last, launch, sync
 
 
 NAME    = __file__.split(os.sep)[-3]

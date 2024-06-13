@@ -4,8 +4,8 @@
 "locate"
 
 
-from objd.iface import fmt
-from objd.run   import broker
+from objx import fmt
+from objr import broker
 
 
 def fnd(event):

@@ -7,10 +7,8 @@
 import time
 
 
-from ..disk   import sync
-from ..find   import fntime, find
-from ..object import Object
-from ..utils  import laps
+from objx import Object
+from objr import fntime, find, laps, sync
 
 
 class NoDate(Exception):

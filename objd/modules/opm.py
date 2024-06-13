@@ -4,10 +4,8 @@
 "outline processor markup language"
 
 
-from ..default import Default
-from ..object  import construct, update
-from ..run     import broker
-from ..utils   import shortid, spl
+from objx import Default, construct, update
+from objr import broker, shortid, spl
 
 
 from .rss import Rss

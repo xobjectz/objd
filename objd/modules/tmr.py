@@ -9,14 +9,9 @@ import re
 import time as ttime
 
 
-from ..disk   import sync
-from ..event  import Event
-from ..find   import find
-from ..object import update
-from ..run    import broker
-from ..thread import launch
-from ..timer  import Timer
-from ..utils  import laps
+from objx import update
+from objr import Event, Timer
+from objr import broker, find, laps, launch, sync
 
 
 def init():

@@ -4,8 +4,7 @@
 "fleet"
 
 
-from objd.iface import Handler, named
-from objd.run   import broker
+from objr import Handler, broker, named
 
 
 def flt(event):

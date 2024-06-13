@@ -5,7 +5,7 @@
 
 
 
-from ..commands import Commands
+from objr.commands import Commands
 
 
 def cmd(event):
